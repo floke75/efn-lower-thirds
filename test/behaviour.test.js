@@ -40,11 +40,35 @@ test('refinements: on by default, off draws the exact Flowics look', () => {
   assert.equal((refined.match(/data-refinement="vignette"/g) || []).length, 2, 'title and ticker plates get the vignette');
   assert.match(refined, /<text data-slot="name"[^>]*filter="url\(#textLight\)"/);
   assert.match(refined, /<text data-slot="title"[^>]*filter="url\(#textDark\)"/);
-  assert.match(refined, /<text data-slot="value"[^>]*filter="url\(#textLight\)"/);
+  assert.match(refined, /<g data-shade="light" filter="url\(#textLight\)"><text data-slot="value"/);
   assert.doesNotMatch(exact, /data-refinement|textLight|textDark/);
   assert.match(exact, /<text data-slot="value"[^>]*filter="url\(#vshadow\)"/, 'exact keeps the Flowics value shadow');
   assert.equal(createLowerThird({ refinements: false }).textFilters, '');
   assert.equal(createLowerThird().plateSvg('navy', { width: 200 }).indexOf('vignette'), -1, 'navy plates have no vignette');
+});
+
+test('separateGlint returns the glint apart from its plate (for a composited overlay)', () => {
+  const lt = createLowerThird();
+  const inline = lt.nameStrap({ name: 'Namn', title: 'Titel' }, { defs: [] });
+  assert.match(inline.namePlate, /class="glint"/);
+  assert.equal(inline.nameGlint, undefined);
+  const sep = lt.nameStrap({ name: 'Namn', title: 'Titel' }, { defs: [], separateGlint: true });
+  assert.doesNotMatch(sep.namePlate, /class="glint"/);
+  assert.match(sep.nameGlint, /^<g data-glint="name-plate" mask="url\(#sil\d+\)"><g class="glint"/);
+  const lb = lt.logoTicker({ logo: 'borslunch' }, { defs: [], separateGlint: true });
+  assert.doesNotMatch(lb.logoPlate, /class="glint"/);
+  assert.match(lb.logoGlint, /data-glint="logo-box"/);
+});
+
+test('ticker pages: refined texts are shaded per group, the exact look keeps per-text filters', () => {
+  const page = [{ 'Kort namn': 'A', 'Eget namn': 'Aa', 'Procent string': '+1 %', 'Color value': '#00ae77' }, { 'Kort namn': 'B', 'Procent string': '-1 %', 'Color value': '#e0012a' }];
+  const refined = createLowerThird().logoTicker({ pages: [page] }, { defs: [] }).pages[0];
+  assert.equal((refined.match(/<g data-shade="dark" filter="url\(#textDark\)">/g) || []).length, 1);
+  assert.equal((refined.match(/<g data-shade="light" filter="url\(#textLight\)">/g) || []).length, 1);
+  assert.doesNotMatch(refined, /<text[^>]*filter=/, 'no per-text filters');
+  const exact = createLowerThird({ refinements: false }).logoTicker({ pages: [page] }, { defs: [] }).pages[0];
+  assert.doesNotMatch(exact, /data-shade/);
+  assert.equal((exact.match(/<text data-slot="value"[^>]*filter="url\(#vshadow\)"/g) || []).length, 2);
 });
 
 test('design tokens carry the measured values', () => {

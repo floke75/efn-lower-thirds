@@ -141,8 +141,12 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
   function textFilter(name, p) {
     const drop = (k) => { const q = p[k]; return `<feGaussianBlur in="SourceAlpha" stdDeviation="${q.blur}"/><feOffset dx="${q.dx}" dy="${q.dy}" result="${k}A"/><feFlood flood-color="${q.color}" flood-opacity="${q.opacity}"/><feComposite in2="${k}A" operator="in" result="${k}"/>`; };
     const band = (k) => { const q = p[k]; return `<feOffset in="SourceAlpha" dx="${q.dx}" dy="${q.dy}" result="${k}S"/><feComposite in="SourceAlpha" in2="${k}S" operator="out"/><feGaussianBlur stdDeviation="${q.blur}"/><feComposite in2="SourceAlpha" operator="in" result="${k}A"/><feFlood flood-color="${q.color}" flood-opacity="${q.opacity}"/><feComposite in2="${k}A" operator="in" result="${k}"/>`; };
-    return `<filter id="${id(name)}" x="-15%" y="-35%" width="130%" height="185%" color-interpolation-filters="sRGB">${drop('ambient')}${drop('contact')}${band('rim')}${band('shade')}` +
-      '<feMerge><feMergeNode in="ambient"/><feMergeNode in="contact"/><feMergeNode in="SourceGraphic"/><feMergeNode in="shade"/><feMergeNode in="rim"/></feMerge></filter>';
+    // a layer that is missing (or has opacity 0) is left out of the filter, e.g. dark text has no inner shade
+    const on = (k) => !!(p[k] && p[k].opacity > 0);
+    const node = (k) => (on(k) ? `<feMergeNode in="${k}"/>` : '');
+    return `<filter id="${id(name)}" x="-15%" y="-35%" width="130%" height="185%" color-interpolation-filters="sRGB">` +
+      ['ambient', 'contact'].filter(on).map(drop).join('') + ['rim', 'shade'].filter(on).map(band).join('') +
+      `<feMerge>${node('ambient')}${node('contact')}<feMergeNode in="SourceGraphic"/>${node('shade')}${node('rim')}</feMerge></filter>`;
   }
   const textFilters = RF ? textFilter('textLight', RF.textLight) + textFilter('textDark', RF.textDark) : '';
   // filter attribute for a text element: kind 'light' (on navy, red, value boxes) or 'dark' (on beige)
@@ -268,7 +272,7 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
 
   // One plate: fill (+ glitter texture) + rims + glint, cut by its anti-aliased silhouette. Returns markup and
   // pushes its <defs> entries into `defs`. Overrides: fill, bevel, glint, shape (e.g. a variant's own values).
-  function plate(c, w, x, y, { fill = c.fill, bevel = c.bevel, glint = c.glint, shape = c.shape, height, defs }) {
+  function plate(c, w, x, y, { fill = c.fill, bevel = c.bevel, glint = c.glint, shape = c.shape, height, defs, glintTo }) {
     const gm = geom(shape, w, x, y, { height });
     const d = rawPath(shape, gm.X, gm.Y, gm.W, gm.H);
     const paint = fillPaint(fill, defs);
@@ -339,12 +343,16 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
       defs.push(`<linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="0">${st.map(([o, a]) => `<stop offset="${o}" stop-color="#fff" stop-opacity="${+a.toFixed(4)}"/>`).join('')}</linearGradient>`);
       const x0 = f2(x + glint.centreFromPx), x1 = f2(x + glint.centreToPx);
       const skew = +(Math.atan(glint.tiltDxPerDy || 0) * 180 / Math.PI).toFixed(2);
-      g += `<g class="glint" transform="translate(0,${f2(midY)}) skewX(${skew}) translate(0,${f2(-midY)})"><g opacity="0">` +
+      const gl = `<g class="glint" transform="translate(0,${f2(midY)}) skewX(${skew}) translate(0,${f2(-midY)})"><g opacity="0">` +
         `<rect x="${f2(-ext)}" y="${f2(gm.Y - 2)}" width="${f2(2 * ext)}" height="${f2(gm.H + 4)}" fill="url(#${gid})"/>` +
         `<animateTransform attributeName="transform" type="translate" values="${x0};${x0};${x1};${x1}" keyTimes="0;${k(glint.visibleFromS)};${k(glint.visibleToS)};1" dur="${L}s" repeatCount="indefinite"/>` +
         (glint.envelope
           ? `<animate attributeName="opacity" values="0;${glint.envelope.map(e => e[1]).join(';')};0" keyTimes="0;${glint.envelope.map(e => k(e[0])).join(';')};1" dur="${L}s" repeatCount="indefinite"/></g></g>`
           : `<animate attributeName="opacity" values="0;0;${glint.peakOpacity};0;0" keyTimes="0;${k(glint.visibleFromS)};${k(glint.peakAtS)};${k(glint.visibleToS)};1" dur="${L}s" repeatCount="indefinite"/></g></g>`);
+      // glintTo: the glint goes into its own markup (same silhouette mask), e.g. for a separately composited layer,
+      // so its animation doesn't make the browser redraw the plate (and its filters) every frame.
+      if (glintTo) glintTo.push(`<g data-glint="${c.id}" mask="url(#${sil})">${gl}</g>`);
+      else g += gl;
     }
     return `<g data-component="${c.id}" mask="url(#${sil})">${g}</g>`;
   }
@@ -411,11 +419,12 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
   // Returns the four parts separately so a graphic can animate them, plus the layout it used:
   //   { namePlate, nameText, titlePlate, titleText, layout }   (titlePlate/titleText are '' when title is '')
   // content: { name, title }. options: measureText (sizes the plates from the text, see composite()),
+  //          separateGlint (the name plate's glint is returned as nameGlint instead of inside namePlate),
   //          row: 'own' (y 880.41, above the main row) | 'main' (y 956.01, in place of the logo box), defs.
   // Fitting (with measureText): the name plate keeps at least its Flowics width and grows with the name; the
   // title box hugs its text (0.5em + text + 0.8em). If both don't fit between the safe edges, the title keeps up
   // to 40% of the row and the fonts shrink to fit, as Flowics' fitOneLine / fitContainer do.
-  function nameStrap(content = {}, { measureText, row = 'own', defs } = {}) {
+  function nameStrap(content = {}, { measureText, row = 'own', defs, separateGlint = false } = {}) {
     const rows = REG.rows, np = comp('name-plate'), tp = comp('title-plate');
     const t = np.text, tt = tp.text, nfs0 = t.effectiveSizePx, tfs0 = tt.effectiveSizePx;
     const y = row === 'main' ? rows.mainRow.y : rows.ownRow.y;
@@ -433,7 +442,9 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
       const titleRoom = avail - nameW;
       if (title && tw > titleRoom) { const s = titleRoom / (padT + titleAdv); tfs = tfs0 * s; tw = titleRoom; }
     }
-    const out = { namePlate: plate(np, nameW, x0, y, { defs }), titlePlate: '', titleText: '' };
+    const glints = separateGlint ? [] : null;
+    const out = { namePlate: plate(np, nameW, x0, y, { defs, glintTo: glints }), titlePlate: '', titleText: '' };
+    if (glints) out.nameGlint = glints.join('');
     useTextFilters(defs);
     out.nameText = `<text data-slot="name" x="${f2(x0 + t.linePaddingEm.left * nfs0)}" y="${f2(y + t.box.y + t.box.h / 2)}" dominant-baseline="central" font-weight="700" font-size="${f2(nfs)}" fill="${t.color}"${textAttr('light')}>${esc(name)}</text>`;
     const layout = { y, name: { x: x0, w: nameW, textBoxW: nameW - 13.5, fontPx: f2(nfs) }, title: null };
@@ -453,18 +464,21 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
   //   { logoPlate, wordmark, tickerPlate, tickerClip, pages, layout }
   // content: { logo (logo-box variant id), pages: [[row, row, row, row], ...] } (rows as in the feed, see
   //          sampleTickerPayload). pages[i] is the markup of page i: 4 column ramps plus each row's value box and
-  //          texts, as Flowics' list item holds them. options: defs (receives the parts' <defs> entries).
+  //          texts, as Flowics' list item holds them. options: defs (receives the parts' <defs> entries),
+  //          separateGlint (the logo box's glint is returned as logoGlint instead of inside logoPlate).
   // The ticker starts 4.5 px before the logo box ends and runs to the safe right edge. tickerClip is the id of a
   // clipPath (pushed to defs) with the ticker plate's silhouette: Flowics clips all column content to it.
   // Column geometry (ramps, value-box fades) is the same on every page, so its defs are made once.
-  function logoTicker(content = {}, { defs } = {}) {
+  function logoTicker(content = {}, { defs, separateGlint = false } = {}) {
     const rows = REG.rows, lb = comp('logo-box'), y = rows.mainRow.y;
     const logoId = def(content.logo, 'borslunch'), pages = def(content.pages, []);
     const v = lb.variants.find(x => x.id === logoId);
     if (!v) throw new Error(`unknown logo-box variant "${logoId}"`);
     const lx = lb.layout.x, lw = v.flowicsSize.w;
     const out = {};
-    out.logoPlate = plate(lb, lw, lx, y, Object.assign({ defs }, v.fill ? { fill: v.fill } : {}, v.bevel ? { bevel: v.bevel } : {}));
+    const glints = separateGlint ? [] : null;
+    out.logoPlate = plate(lb, lw, lx, y, Object.assign({ defs, glintTo: glints }, v.fill ? { fill: v.fill } : {}, v.bevel ? { bevel: v.bevel } : {}));
+    if (glints) out.logoGlint = glints.join('');
     out.wordmark = wordmark(v, lx, y);
     if (out.wordmark && defs.indexOf(logoFilters) < 0) defs.push(logoFilters);   // the wordmark's inset filter
     if (out.wordmark) useTextFilters(defs);                                         // and its shading (refinements)
@@ -497,17 +511,24 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
         `<mask id="${mid}" maskUnits="userSpaceOnUse" x="${f2(bx)}" y="${f2(by)}" width="${vb.size.w}" height="${vb.size.h}"><rect x="${f2(bx)}" y="${f2(by)}" width="${vb.size.w}" height="${vb.size.h}" fill="url(#${fid})"/></mask>`);
       return { cx, ramp: `<path data-component="ticker-column-ramp" d="${shapePath(rs, ramp.size.w, rx, ry)}" fill="url(#${gid})"/>`, boxPath: shapePath(vb.shape, vb.size.w, bx, by), mask: mid };
     }) : [];
-    out.pages = pages.map((page) => columns.map((c, i) => {
-      const row = page[i];
-      let s = c.ramp;
-      if (!row) return s;
-      if (row['Color value']) s += `<path data-component="ticker-value-box" d="${c.boxPath}" fill="${escAttr(row['Color value'])}" mask="url(#${c.mask})"/>`;
-      s += `<text data-slot="short" x="${f2(c.cx + ts.short.linePaddingEm.left * 32)}" y="${f2(listY + ts.short.linePaddingEm.top * 32 + 32)}"${darkWeight(32, ts.short.color)} font-size="32" fill="${ts.short.color}"${textAttr('dark')}>${esc(def(row['Kort namn'], ''))}</text>`;
-      // value: the Flowics drop shadow, or with refinements the light-text shading (which includes its shadow)
-      s += `<text data-slot="value" x="${f2(c.cx + colW - ts.value.linePaddingEm.right * 32)}" y="${f2(listY + ts.value.linePaddingEm.top * 32 + 32)}" text-anchor="end" font-weight="700" font-size="32" fill="#fff"${RF ? textAttr('light') : ` filter="url(#${id('vshadow')})"`}>${esc(def(row['Procent string'], ''))}</text>`;
-      if (row['Eget namn']) s += `<text data-slot="long" x="${f2(c.cx + ts.long.linePaddingEm.left * 18)}" y="${f2(listY + listH - 9)}" font-weight="400" font-size="18" fill="${ts.long.color}"${textAttr('dark')}>${esc(row['Eget namn'])}</text>`;
-      return s;
-    }).join(''));
+    // Per column: ramp, value box, short name, value, long name. With refinements the texts of a page are shaded
+    // as two groups (dark names, light values) instead of one filter per text: the columns never overlap, so it
+    // looks the same at a fraction of the drawing work.
+    const shortText = (c, row, shade) => `<text data-slot="short" x="${f2(c.cx + ts.short.linePaddingEm.left * 32)}" y="${f2(listY + ts.short.linePaddingEm.top * 32 + 32)}"${darkWeight(32, ts.short.color)} font-size="32" fill="${ts.short.color}"${shade ? textAttr('dark') : ''}>${esc(def(row['Kort namn'], ''))}</text>`;
+    // value: the Flowics drop shadow, or with refinements the light-text shading (which includes its shadow)
+    const valueText = (c, row, shade) => `<text data-slot="value" x="${f2(c.cx + colW - ts.value.linePaddingEm.right * 32)}" y="${f2(listY + ts.value.linePaddingEm.top * 32 + 32)}" text-anchor="end" font-weight="700" font-size="32" fill="#fff"${RF ? (shade ? textAttr('light') : '') : ` filter="url(#${id('vshadow')})"`}>${esc(def(row['Procent string'], ''))}</text>`;
+    const longText = (c, row, shade) => (row['Eget namn'] ? `<text data-slot="long" x="${f2(c.cx + ts.long.linePaddingEm.left * 18)}" y="${f2(listY + listH - 9)}" font-weight="400" font-size="18" fill="${ts.long.color}"${shade ? textAttr('dark') : ''}>${esc(row['Eget namn'])}</text>` : '');
+    const box = (c, row) => (row['Color value'] ? `<path data-component="ticker-value-box" d="${c.boxPath}" fill="${escAttr(row['Color value'])}" mask="url(#${c.mask})"/>` : '');
+    out.pages = pages.map((page) => {
+      if (!RF) return columns.map((c, i) => { const row = page[i]; return row ? c.ramp + box(c, row) + shortText(c, row, true) + valueText(c, row, true) + longText(c, row, true) : c.ramp; }).join('');
+      let under = '', dark = '', light = '';
+      columns.forEach((c, i) => {
+        const row = page[i];
+        under += c.ramp + (row ? box(c, row) : '');
+        if (row) { dark += shortText(c, row, false) + longText(c, row, false); light += valueText(c, row, false); }
+      });
+      return under + (dark ? `<g data-shade="dark"${textAttr('dark')}>${dark}</g>` : '') + (light ? `<g data-shade="light"${textAttr('light')}>${light}</g>` : '');
+    });
     out.layout = { y, logo: { x: lx, w: lw, variant: v.id }, ticker: { x: tx, w: tw }, list: { x: listX, y: listY, w: listW, h: listH, colW } };
     return out;
   }

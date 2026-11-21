@@ -196,7 +196,7 @@ export default class EfnTicker extends EfnGraphic {
   buildScene(scene) {
     this.lt.resetIds();
     const defs = [];
-    const s = this.lt.logoTicker({ logo: scene.logo, pages: scene.pages }, { defs });
+    const s = this.lt.logoTicker({ logo: scene.logo, pages: scene.pages }, { defs, separateGlint: true });
     const L = (this._layout = s.layout);
     this._tickerClip = s.tickerClip;
     const id = (n) => `${this._id}${n}`;
@@ -206,29 +206,31 @@ export default class EfnTicker extends EfnGraphic {
       `<clipPath id="${id('listWipe')}"><rect data-efn="list-wipe" x="${f2(L.ticker.x - 3)}" y="${top}" width="0" height="${h}"/></clipPath>`);
     // The ticker plate slides under its own slanted left edge: while it moves it is clipped to its silhouette at
     // rest (Flowics' hard mask). The columns are always clipped to it.
+    // The logo box's glint goes in the overlay (composited separately, so it doesn't redraw the plates and text).
+    const logoGroup = (inner) => `<g data-efn="logo" clip-path="url(#${id('logoSlide')})"><g data-efn="logo-slide">${inner}</g></g>`;
     const body =
-      `<g data-efn="logo" clip-path="url(#${id('logoSlide')})"><g data-efn="logo-slide">${s.logoPlate}${s.wordmark}</g></g>` +
+      logoGroup(s.logoPlate + s.wordmark) +
       `<g data-efn="plate"><g data-efn="plate-clip"><g data-efn="plate-slide">${s.tickerPlate}</g></g></g>` +
       `<g data-efn="list" clip-path="url(#${s.tickerClip})"><g clip-path="url(#${id('listWipe')})"><g data-efn="list-move">` +
       s.pages.map((p, i) => `<g data-page="${i}">${p}</g>`).join('') +
       '</g></g></g>';
-    return { defs, body };
+    return { defs, body, overlay: logoGroup(s.logoGlint) };
   }
 
-  bindScene(svg) {
-    const q = (sel) => svg.querySelector(sel);
+  bindScene(root) {
+    const q = (sel) => root.querySelector(sel), all = (sel) => Array.prototype.slice.call(root.querySelectorAll(sel));
     this._el = {
-      logo: q('[data-efn="logo"]'), logoSlide: q('[data-efn="logo-slide"]'),
+      logo: all('[data-efn="logo"]'), logoSlide: all('[data-efn="logo-slide"]'),
       plate: q('[data-efn="plate"]'), plateClip: q('[data-efn="plate-clip"]'), plateSlide: q('[data-efn="plate-slide"]'),
       list: q('[data-efn="list"]'), wipe: q('[data-efn="list-wipe"]'), move: q('[data-efn="list-move"]'),
-      pages: Array.prototype.slice.call(svg.querySelectorAll('[data-page]')),
+      pages: all('[data-page]'),
     };
   }
 
   applyChannels(v, T) {
     const L = this._layout, el = this._el;
     show(el.logo, v.logo > 0);
-    move(el.logoSlide, v.logo >= 1 ? 0 : -(1 - v.logo) * L.logo.w, 1);
+    el.logoSlide.forEach((g) => move(g, v.logo >= 1 ? 0 : -(1 - v.logo) * L.logo.w, 1));
     show(el.plate, v.plate > 0);
     move(el.plateSlide, v.plate >= 1 ? 0 : -(1 - v.plate) * L.ticker.w, 1);
     if (v.plate >= 1) el.plateClip.removeAttribute('clip-path');
@@ -272,7 +274,8 @@ function normalizePages(pages) {
 }
 function str(v) { return v === undefined || v === null ? '' : String(v); }
 
-function show(el, on) { if (on) el.removeAttribute('display'); else el.setAttribute('display', 'none'); }
+// show / hide one element or each element of a list
+function show(el, on) { [].concat(el).forEach((e) => { if (on) e.removeAttribute('display'); else e.setAttribute('display', 'none'); }); }
 // Horizontal offset and opacity of a group; attributes are removed at rest so the shown state is the plain markup.
 function move(el, x, opacity) {
   if (Math.abs(x) < 0.005) el.removeAttribute('transform'); else el.setAttribute('transform', `translate(${f2(x)},0)`);

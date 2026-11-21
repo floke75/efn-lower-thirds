@@ -41,7 +41,7 @@ export default class EfnNameStrap extends EfnGraphic {
   buildScene(data) {
     this.lt.resetIds();
     const defs = [];
-    const s = this.lt.nameStrap({ name: data.name, title: data.title }, { measureText: this.measureText, row: data.row, defs });
+    const s = this.lt.nameStrap({ name: data.name, title: data.title }, { measureText: this.measureText, row: data.row, defs, separateGlint: true });
     const L = (this._layout = s.layout);
     const id = (n) => `${this._id}${n}`;
     const top = f2(L.y - 12), h = 100;   // clip band: the row plus room for rims and the glint's overshoot
@@ -49,34 +49,37 @@ export default class EfnNameStrap extends EfnGraphic {
       `<clipPath id="${id('slide')}"><rect x="${f2(L.name.x)}" y="${top}" width="${OPEN}" height="${h}"/></clipPath>`,
       `<clipPath id="${id('nameWipe')}"><rect data-efn="name-wipe" x="${f2(L.name.x - 3)}" y="${top}" width="0" height="${h}"/></clipPath>`,
       `<clipPath id="${id('titleWipe')}"><rect data-efn="title-wipe" x="${f2((L.title ? L.title.x : 0) - 3)}" y="${top}" width="0" height="${h}"/></clipPath>`);
+    // The name plate's glint goes in the overlay (composited separately, so it doesn't redraw the plates and text).
+    const plateGroup = (inner) => `<g data-efn="plate" clip-path="url(#${id('slide')})"><g data-efn="slide">${inner}</g></g>`;
     const body =
-      `<g data-efn="plate" clip-path="url(#${id('slide')})"><g data-efn="slide">${s.namePlate}</g></g>` +
+      plateGroup(s.namePlate) +
       `<g data-efn="name" clip-path="url(#${id('nameWipe')})">${s.nameText}</g>` +
       (L.title ? `<g data-efn="title" clip-path="url(#${id('titleWipe')})">${s.titlePlate}${s.titleText}</g>` : '');
-    return { defs, body };
+    return { defs, body, overlay: plateGroup(s.nameGlint) };
   }
 
-  bindScene(svg) {
-    const q = (sel) => svg.querySelector(sel);
+  bindScene(root) {
+    const all = (sel) => Array.prototype.slice.call(root.querySelectorAll(sel));
     this._el = {
-      plate: q('[data-efn="plate"]'), slide: q('[data-efn="slide"]'),
-      name: q('[data-efn="name"]'), nameWipe: q('[data-efn="name-wipe"]'),
-      title: q('[data-efn="title"]'), titleWipe: q('[data-efn="title-wipe"]'),
+      plate: all('[data-efn="plate"]'), slide: all('[data-efn="slide"]'),
+      name: all('[data-efn="name"]'), nameWipe: root.querySelector('[data-efn="name-wipe"]'),
+      title: all('[data-efn="title"]'), titleWipe: root.querySelector('[data-efn="title-wipe"]'),
     };
   }
 
   applyChannels(v) {
     const L = this._layout, el = this._el;
     show(el.plate, v.plate > 0);
-    el.slide.setAttribute('transform', v.plate >= 1 ? '' : `translate(${f2(-(1 - v.plate) * L.name.w)},0)`);
+    el.slide.forEach((g) => g.setAttribute('transform', v.plate >= 1 ? '' : `translate(${f2(-(1 - v.plate) * L.name.w)},0)`));
     show(el.name, v.name > 0);
     el.nameWipe.setAttribute('width', v.name >= 1 ? OPEN : f2(3 + v.name * L.name.textBoxW));
-    if (el.title) {
+    if (L.title) {
       show(el.title, v.title > 0);
       el.titleWipe.setAttribute('width', v.title >= 1 ? OPEN : f2(3 + v.title * L.title.elementW));
     }
   }
 }
 
-function show(el, on) { if (on) el.removeAttribute('display'); else el.setAttribute('display', 'none'); }
+// show / hide one element or each element of a list
+function show(el, on) { [].concat(el).forEach((e) => { if (on) e.removeAttribute('display'); else e.setAttribute('display', 'none'); }); }
 function f2(n) { return Math.round(n * 100) / 100; }

@@ -180,7 +180,7 @@ Not part of the Flowics original: designed on top of the measured look, on by de
 - **Text shading** (an SVG filter per text colour):
   - a soft ambient shadow and a tight contact shadow, offset down-right;
   - the light caught by each glyph's top-left inner edge (rim);
-  - a slight darkening of its bottom-right inner edge (shade).
+  - a slight darkening of its bottom-right inner edge (shade), on light text only: on dark text it was invisible, so it is left out there.
 
   The EFN logo and the programme wordmarks get the light-text version on top of their measured treatment.
 
@@ -195,6 +195,14 @@ Not part of the Flowics original: designed on top of the measured look, on by de
     So the burn stays gradual until close to the edge and never reads as a frame. It is shifted slightly towards the light at the upper left.
   - **Corners:** the distance is measured per axis (left/right and slanted edges, top/bottom) and the stronger one wins, so a corner is never darker than the edges beside it.
   - **Layering:** it sits under the narrow rims, so the two read as one deeper bevel.
+
+## Rendering cost
+
+SVG filters (rims are plain paths; the refinements' text shading and vignette are filters) are redrawn whenever anything over or under them changes, so the graphics keep animated parts away from them:
+
+- **Glints:** drawn in a separate, composited SVG on top (`overlay` in `ograf/lib/efn-graphic.mjs`), so the glint animation never redraws the plates or text. The glint passes over the white text and wordmarks, which at 9–15% white is invisible (measured: at most 9 levels of 255 at 1080p).
+- **Ticker texts:** shaded as two groups per page (dark names, light values) instead of one filter per text.
+- **Text is not composited:** Chrome positions text in a composited layer slightly differently (up to about 1.5 px at UHD), so plates and text stay in the normal layer.
 
 ## Not covered yet
 

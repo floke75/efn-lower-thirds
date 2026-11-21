@@ -19,8 +19,14 @@
 //   static get defaults()            data used when load() gets no data (mirrors the manifest schema defaults)
 //   static get animation()           { in: {channel: {delay, duration, ease}}, out: {...} }  (ms; ease: see EASE)
 //   normalize(data)                  -> clean data object (types coerced, unknown fields dropped)
-//   buildScene(scene)                -> { defs: string[], body: string }  SVG markup for the 1920x1080 stage
-//   bindScene(svg)                   look up the elements applyChannels() drives
+//   buildScene(scene)                -> { defs: string[], body: string, overlay?: string } SVG markup for the
+//                                    1920x1080 stage. overlay (e.g. the glints) is drawn in a second SVG on top,
+//                                    composited separately (will-change), so its animation doesn't make the
+//                                    browser redraw the plates and text with their filters every frame. Only the
+//                                    overlay is promoted: text rendered in a composited layer is positioned
+//                                    slightly differently, so plates and text stay in the normal layer.
+//   bindScene(root)                  look up the elements applyChannels() drives (root: the shadow root, so a
+//                                    lookup also finds the overlay's copies of a group)
 //   applyChannels(values, T)         values = {channel: 0..1} at time T (ms); update transforms / clip rects
 // Optional, for graphics with their own data source or time-based content (e.g. ticker pages):
 //   async prepare()                  called by load() before the first render (e.g. fetch a feed); teardown()
@@ -41,6 +47,7 @@ export const EASE = ease;
 const STAGE_CSS = `
 :host { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
 svg.efn-stage { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; }
+svg.efn-overlay { will-change: transform; }
 text { font-family: AkkuratStd, Arial, sans-serif; }
 `;
 
@@ -102,6 +109,7 @@ export class EfnGraphic extends HTMLElement {
     this._sceneLog = [];
     this._schedule = [];
     this._svg = null;
+    this._svgs = [];
     return { statusCode: 200 };
   }
 
@@ -338,9 +346,12 @@ export class EfnGraphic extends HTMLElement {
     const key = JSON.stringify(resolved);
     if (key !== this._renderedKey) {
       const scene = this.buildScene(resolved);
-      this._root.innerHTML = `<style>${STAGE_CSS}</style><svg class="efn-stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet"><defs>${scene.defs.join('')}</defs>${scene.body}</svg>`;
-      this._svg = this._root.querySelector('svg');
-      this.bindScene(this._svg);
+      const svgOpen = (cls) => `<svg class="${cls}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet">`;
+      this._root.innerHTML = `<style>${STAGE_CSS}</style>${svgOpen('efn-stage')}<defs>${scene.defs.join('')}</defs>${scene.body}</svg>` +
+        (scene.overlay ? `${svgOpen('efn-stage efn-overlay')}${scene.overlay}</svg>` : '');
+      this._svgs = Array.prototype.slice.call(this._root.querySelectorAll('svg.efn-stage'));
+      this._svg = this._svgs[0];
+      this.bindScene(this._root);
       this._renderedKey = key;
     }
     this.applyChannels(this._valuesAt(T), T);
@@ -350,16 +361,17 @@ export class EfnGraphic extends HTMLElement {
   // Glints are SMIL animations on a 15 s loop that starts when the graphic is taken in (as the Flowics videos
   // did). Real-time: restart the SVG clock at each take-in and let it run. Non-real-time: pause it and seek.
   _syncGlint(T) {
-    const svg = this._svg;
-    if (!svg || typeof svg.setCurrentTime !== 'function') return;
     const since = this._shownSince(T);
-    if (since === null || this._renderType !== 'realtime') {
-      svg.pauseAnimations();
-      svg.setCurrentTime(since === null ? 0 : Math.max(0, T - since) / 1000);
-    } else {
-      const want = Math.max(0, T - since) / 1000;
-      if (svg.animationsPaused() || Math.abs(svg.getCurrentTime() - want) > 0.1) svg.setCurrentTime(want);
-      svg.unpauseAnimations();
+    for (const svg of this._svgs || []) {   // each SVG layer has its own animation clock
+      if (typeof svg.setCurrentTime !== 'function') continue;
+      if (since === null || this._renderType !== 'realtime') {
+        svg.pauseAnimations();
+        svg.setCurrentTime(since === null ? 0 : Math.max(0, T - since) / 1000);
+      } else {
+        const want = Math.max(0, T - since) / 1000;
+        if (svg.animationsPaused() || Math.abs(svg.getCurrentTime() - want) > 0.1) svg.setCurrentTime(want);
+        svg.unpauseAnimations();
+      }
     }
   }
 

@@ -40,7 +40,7 @@ const tan = Math.tan((np.shape.skewDeg * Math.PI) / 180);
 // Refinement parameters (SVG filter terms: dx/dy offset, blur = stdDeviation) as shadows (blur radius = 2 x stdDeviation).
 const rgbaOf = (hexColor, a) => { const h = hexColor.replace('#', ''); return `rgba(${[0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)).join(', ')}, ${a})`; };
 const shadowOf = (q, inset) => Object.assign({ color: rgbaOf(q.color, q.opacity), offsetX: q.dx, offsetY: q.dy, blur: r4(q.blur * 2), spread: 0 }, inset ? { inset: true } : {});
-const textShading = (p) => [shadowOf(p.ambient), shadowOf(p.contact), shadowOf(p.rim, true), shadowOf(p.shade, true)];
+const textShading = (p) => [shadowOf(p.ambient), shadowOf(p.contact), shadowOf(p.rim, true)].concat(p.shade ? [shadowOf(p.shade, true)] : []);
 
 const tree = {
   color: {

@@ -71,6 +71,7 @@ Not reproduced: Flowics delays the BÖRSFRUKOST logo box's take-out by 1 s (only
 - **`dispose()`** clears everything.
 - **Manifest extras:** `actionDurations`, `thumbnails`, `renderRequirements` (ideal values only, so no renderer is excluded), and GDD types for the data form.
 - **Engine support:** runtime code is ES2018 and uses only browser APIs present in Chromium/CEF 69, the engine generation still found in playout. `npm run check` guards this. It has been tested in current Chromium only.
+- **Rendering cost:** the glints (white sweeps on the name plate and logo box) are drawn in a separate SVG on top, which the browser composites on its own (`will-change`). The glint animation then redraws only that layer, not the plates and text with their filters. With the refinements, the ticker during the logo-box glint went from 7.5 to 2.0 ms of GPU drawing per frame at UHD; the name strap glint from 1.8 to 0.1 ms. Measured on an RTX 5090: expect more on playout hardware. Plates and text stay in the normal layer, because Chrome positions text in a composited layer slightly differently.
 - **Fonts and sizing:** AkkuratStd is registered from the package (`FontFace`). The graphic fills its element at any 16:9 resolution, and renders sharpest at UHD.
 
 **Developing:** run `npm run demo` and open http://127.0.0.1:8765/ograf-dev/. It is a small OGraf renderer:
@@ -100,9 +101,11 @@ For new broadcast graphics and motion elements in the EFN look (not general web 
 Groups: `color` (text, plate fills and gradients, ticker values), `font`, `typography` (one style per text slot), `shadow`, `effect` (the refinements below), `shape` (skew 8.45°, radii, the 4.5 px chaining overlap), `size`, `layout` (canvas, safe area, rows), `spacing` (em insets), `motion` (easings, durations, the 75 px shift), `glint`. px are on the 1920×1080 canvas.
 
 **Refinements:** two additions on top of the measured Flowics look, on by default in everything (OGraf graphics, `composite()`, plate styles, `<efn-plate>`):
-- **Text shading:** a soft ambient shadow and a tight contact shadow, light caught by the top-left inner edge of each glyph and a slight shade on its bottom-right inner edge. One version for light text (on navy, red and the value boxes; it replaces the original value shadow) and a warmer, lighter one for dark text on beige. The EFN logo and the programme wordmarks get the light version on top of their own treatment.
+- **Text shading:** a soft ambient shadow and a tight contact shadow, light caught by the top-left inner edge of each glyph and, on light text, a slight shade on its bottom-right inner edge. One version for light text (on navy, red and the value boxes; it replaces the original value shadow) and a warmer, lighter one without the inner shade for dark text on beige. The EFN logo and the programme wordmarks get the light version on top of their own treatment.
 - **Dark text weight:** bold dark text (title, ticker names) is drawn a little lighter, so the shading doesn't make it look heavy: AkkuratStd 400 thickened by a stroke in the text colour (0.03 em), a synthetic semibold between the 400 and 700 the font ships with.
 - **Beige vignette:** towards their edges the title, ticker and text-line plates burn in: the sand colour gets darker with more contrast and more saturation (a gamma curve plus a saturation boost on the plate's own colour, not a grey overlay). It is full only at the very edge and fades out gradually over a wide band, following the plate shape; corners are never stronger than the edges beside them. It sits under the narrow rims and is lit from the upper left like them, so the lower and right edges burn slightly more.
+
+**Cost:** the refinements add GPU drawing time only on frames where something under them changes (still frames are cached). Measured at UHD on an RTX 5090: about +0.8 ms per frame for the ticker's animations (2.3 ms against 1.6 ms for the exact look), about +0.2 ms for the name strap; the glints are almost free (see Rendering cost above). The ticker's page texts are shaded per group (dark names, light values) rather than one filter per text, which looks the same and costs less.
 
 The parameters are in `data/design-tokens.json` → `refinements` (and as tokens under `effect`). `createLowerThird({ refinements: false })` and `<efn-plate flat>` give the exact Flowics replica. The snapshot tests lock both looks. The renderer's `textFilters` and `textAttr('light' | 'dark')` apply the text shading to your own SVG text.
 
@@ -154,7 +157,7 @@ The plate fills exactly `x..x+width` × `y..y+height`. Rims keep their measured 
 The repository is an installable package: plain ES modules, no runtime dependencies, no build step, with TypeScript declarations (checked by `npm run typecheck`).
 
 ```bash
-npm install github:floke75/efn-lower-thirds#v0.5.0
+npm install github:floke75/efn-lower-thirds#v0.5.1
 ```
 
 The repository is private, so the machine running the install needs GitHub access to it (for example, signed in with `gh auth login`). Pin a tag, and bump it to take an update.

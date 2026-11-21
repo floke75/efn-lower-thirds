@@ -81,6 +81,9 @@ export interface PlateOptions {
   glint?: unknown;
   shape?: Shape;
   height?: number;
+  /** Receives the plate's glint (masked to the plate) instead of drawing it inside the plate, e.g. for a separately
+   *  composited layer so the glint animation doesn't redraw the plate. */
+  glintTo?: string[];
 }
 
 export interface Geometry { X: number; Y: number; W: number; H: number }
@@ -91,11 +94,15 @@ export interface NameStrapOptions {
   row?: 'own' | 'main';
   /** Receives the parts' <defs> entries. */
   defs?: string[];
+  /** Return the name plate's glint separately (nameGlint) instead of inside namePlate. */
+  separateGlint?: boolean;
 }
 
 export interface NameStrap {
   namePlate: string;
   nameText: string;
+  /** The name plate's glint, when separateGlint was set. */
+  nameGlint?: string;
   /** '' when the title is empty */
   titlePlate: string;
   titleText: string;
@@ -109,6 +116,8 @@ export interface NameStrap {
 
 export interface LogoTicker {
   logoPlate: string;
+  /** The logo box's glint, when separateGlint was set. */
+  logoGlint?: string;
   /** '' when no wordmark was supplied for the variant */
   wordmark: string;
   tickerPlate: string;
@@ -164,7 +173,7 @@ export interface StylePlateOptions {
 /** One layer of the refinements' SVG shading: offset, gaussian blur (stdDeviation), colour and opacity. */
 export interface FilterLayer { dx: number; dy: number; blur: number; color: string; opacity: number }
 /** Text shading: ambient and contact drop shadows, rim light (top-left inner edge), shade (bottom-right inner edge). */
-export interface TextShading { ambient: FilterLayer; contact: FilterLayer; rim: FilterLayer; shade: FilterLayer }
+export interface TextShading { ambient: FilterLayer; contact: FilterLayer; rim: FilterLayer; shade?: FilterLayer }
 /** EFN's additions to the measured look (tokens.refinements). */
 export interface Refinements {
   textLight: TextShading;
@@ -221,7 +230,7 @@ export interface Renderer {
   /** One styled plate as a complete SVG document (width x height, or fluid). */
   plateSvg(name: PlateStyleName, options: Omit<StylePlateOptions, 'defs' | 'x' | 'y'> & { fluid?: boolean }): string;
   /** Logo box + ticker plate on the main row, with the ticker pages, as separate parts (for animating them). */
-  logoTicker(content?: { logo?: string; pages?: TickerRow[][] }, options?: { defs: string[] }): LogoTicker;
+  logoTicker(content?: { logo?: string; pages?: TickerRow[][] }, options?: { defs: string[]; separateGlint?: boolean }): LogoTicker;
   /** The full lower third as one SVG document. */
   composite(content?: Content, options?: CompositeOptions): string;
   /** Every plate at its Flowics size, without text. */

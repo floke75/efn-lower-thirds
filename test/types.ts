@@ -41,6 +41,8 @@ const tickerDefs: string[] = [];
 const lbt: LogoTicker = lt.logoTicker({ logo: 'borslunch', pages: [sampleTickerPayload.data.open[0]] }, { defs: tickerDefs });
 const tickerMarkup: string = lbt.logoPlate + lbt.wordmark + lbt.tickerPlate + `<g clip-path="url(#${lbt.tickerClip})">${lbt.pages.join('')}</g>`;
 const colW: number = lbt.layout.list.colW;
+const glintMarkup: string | undefined = lt.logoTicker({ logo: 'borslunch' }, { defs: tickerDefs, separateGlint: true }).logoGlint;
+const nameGlint: string | undefined = lt.nameStrap({ name: 'x' }, { defs: [], separateGlint: true }).nameGlint;
 const styleName: PlateStyleName = lt.plateStyles[0];
 const styled: string = lt.stylePlate('navy', { width: 300, height: 50, slant: 'both', glint: true, defs: tickerDefs });
 const styledDoc: string = lt.plateSvg('beige', { width: 200, fluid: true });

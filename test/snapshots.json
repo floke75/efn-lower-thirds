@@ -1,11 +1,11 @@
 {
   "composite/flowics-widths": {
-    "sha256": "6aa5aa19d3a9771c44eca6a106dc007609e0706cfc9a463e32b7d56b9105fec1",
-    "bytes": 222361
+    "sha256": "f693423860806ce5bb979cb20165153de872b465ab00d2bf428412c416fa6728",
+    "bytes": 221863
   },
   "composite/measured": {
-    "sha256": "781143dac92c8441dd20de5fac7d1d5dc0269a9fe8343f1a75d1254694901416",
-    "bytes": 219602
+    "sha256": "60275f4fb5f56d5c5aeb5b97257d18ef9b680fb14eeeebd3ea7a91ae2f6c5cf4",
+    "bytes": 219080
   },
   "elements/location-plate": {
     "sha256": "82b6b88eb4afa35d6ecc64f7818e342a0e745214d7dd401b19fe9bca22c7eae5",
@@ -20,28 +20,28 @@
     "bytes": 36474
   },
   "elements/logo-box--borslunch": {
-    "sha256": "19b979695722eaeddc954162174ddbc5d80e319539f95e834f37bcdf286fdd30",
-    "bytes": 45283
+    "sha256": "be2d6174cb75cf22814734a34a4e422a02ee28fcad9ec509809d7cfda3e59023",
+    "bytes": 44929
   },
   "elements/logo-box--direkt": {
-    "sha256": "9af95fc0d7e2b822452e20ef61ae69ad5c1a0c06bcc0a7bce966061462a8d057",
-    "bytes": 42278
+    "sha256": "9c50fed7c399d5582332fb48dae80de9136da4bcf2b442d94871332cd24550b5",
+    "bytes": 41924
   },
   "elements/logo-box--marknad": {
     "sha256": "b77d323ae957439fe94a9482fd73e4473e2aa071e9f5f11d36bdae05aad76f2b",
     "bytes": 36474
   },
   "elements/logo-box--morgon": {
-    "sha256": "ddfea3ba8ca9bdabfbfd9c282d5db4d1150e3bc938f07b65d0496149971d20f5",
-    "bytes": 43500
+    "sha256": "6d5748ae2b280b7b392e79a8a08589e7c7392446d9c16b4819fd166bdd9d0fa0",
+    "bytes": 43146
   },
   "elements/logo-box--nobel": {
-    "sha256": "274594d74ecc5a19fec378f98ea9b3703f932bfd3ac72ddae889322266389172",
-    "bytes": 60428
+    "sha256": "b5b6bab3086fa1ec045a01e3c8d0240227d2b50d08d5df4d49cbeccadb1a3ee5",
+    "bytes": 60074
   },
   "elements/logo-box--ravaror": {
-    "sha256": "b6335df699ba297838fed12ad7c262512cb3b9ba8128f27dcf0128106f4a7be1",
-    "bytes": 43194
+    "sha256": "7e1711c10e300443f79d71b09c26fb13b26a4c4ceb25e0dc0124a39dcd7714b5",
+    "bytes": 42840
   },
   "elements/logo-box--update": {
     "sha256": "63bf7defa38259b2f4b222c6d4b476199547135c14f9af5d47c44e8c2eab8353",
@@ -52,8 +52,8 @@
     "bytes": 27688
   },
   "elements/logo-line-logo": {
-    "sha256": "96f80b975c51778a9cc41ff2e31ee4c6bcc7f9e97443cabcd02030a496b99a70",
-    "bytes": 4768
+    "sha256": "77f5c1ac132b60ca3553ee042f98594679c64b80b836aebc2b459aae26276a89",
+    "bytes": 4414
   },
   "elements/logo-line-right": {
     "sha256": "4bae40d93669684ed4e758b8dfb38d016e0aa0f14c65b81cf6ba37a0e72f5035",
@@ -132,48 +132,48 @@
     "bytes": 34850
   },
   "logo-ticker/borsfrukost": {
-    "sha256": "d443ddfcf9662ee356897ed3848941519691f3756fae1388f4ce962f77f930d2",
-    "bytes": 82178
+    "sha256": "5413ca66604572d3e5e5e239ab2d0c436d4b5369431da7de9c16c0ca33ff3b01",
+    "bytes": 81488
   },
   "logo-ticker/borslunch": {
-    "sha256": "ae7aa860b5be9c9d139080465de324cc4c148eabc1ed238195f70d85c01a0f19",
-    "bytes": 88325
+    "sha256": "40f108dd90ec010500ccec8ec6f8e02f814b3d3fed0dbfa6a6002b77ff0af8cd",
+    "bytes": 87635
   },
   "logo-ticker/direkt": {
-    "sha256": "3232c58b4afd767d04a153fcdc5a4e0f00f222902abda54573f216b0d4f1dec2",
-    "bytes": 85315
+    "sha256": "8a762be65d1c2d75159a628c7455805747491b9053984f57596f2f477556fe89",
+    "bytes": 84625
   },
   "logo-ticker/marknad": {
-    "sha256": "f985199b58ed790fece4a9893fd2514bc6fddb9636cf1d9bcd97f33b0f96efea",
-    "bytes": 82188
+    "sha256": "c34019934a37dc8d00f48bbd8f43fbff3e53d241ca9897c96155c0b95f3b8017",
+    "bytes": 81498
   },
   "logo-ticker/morgon": {
-    "sha256": "1f779bbc7f28b861409820f893bbe547fb7038a9d87ff8301e215716c9baaf10",
-    "bytes": 86540
+    "sha256": "0cfbe4e4a0b637494ee07b0d02cef6348ccd15fd8ffdcc0de610cfa54825d6b6",
+    "bytes": 85850
   },
   "logo-ticker/nobel": {
-    "sha256": "c5966e4d7b42425553091f8ce5f972679ec2c5560b4274a21ba02a92f622bc6c",
-    "bytes": 103768
+    "sha256": "9d5142b5f2f05329b6713fa0501ad7029e54ee97d200d6ab1fa04ee205e9c619",
+    "bytes": 103078
   },
   "logo-ticker/ravaror": {
-    "sha256": "db7005277ab27c4020fca714e62472e9cd0a0f2440f35df91356fe78fcc74e3b",
-    "bytes": 86234
+    "sha256": "8c4bd39c115ef6240b4a09dec870897c8c76574e524d087d05306e55a6c26081",
+    "bytes": 85544
   },
   "logo-ticker/update": {
-    "sha256": "5904552f0ac5e4ff7f3afca58d69f928f090dfa276f1e4a2aa0c9b1d6496eafc",
-    "bytes": 82160
+    "sha256": "4eaee908e986596cfb10232c062e34ff79a982b24ba5238762167f9c53c4811b",
+    "bytes": 81470
   },
   "name-strap/main-long": {
-    "sha256": "12d391832e5515e1c538c26ac24a6a556c10f6bf3527020d384e21137b9025cb",
-    "bytes": 72520
+    "sha256": "62150aa729f85c8cdb9f4ce7057ab671c9d51ce3c6fd8c6577ed12a522b84e28",
+    "bytes": 72166
   },
   "name-strap/no-title": {
-    "sha256": "5e3c4be9c9a0a6910108a87390169bed4f8785a4cbc8b36910a457a101e80757",
-    "bytes": 40020
+    "sha256": "f8cd5a25a74fdef8e7eb5e8b3929c58e370c1488d5e7c97628844a3612578f99",
+    "bytes": 39666
   },
   "name-strap/own": {
-    "sha256": "d38c0e9460b82d19086f1f299289f9cc2a05ac96fd040710ddff48adb58845ea",
-    "bytes": 71965
+    "sha256": "cb4400eabc231fdef1aa19cfb699f0aab87acb575f56a85fe0a78d5b43159c3d",
+    "bytes": 71611
   },
   "plates/beige": {
     "sha256": "46f50f423e9817f919119d1c8a219069849ee4f039af1988e1052927c7bcce29",

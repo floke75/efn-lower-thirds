@@ -1,6 +1,6 @@
 {
   "name": "efn-lower-thirds",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "description": "EFN broadcast graphics in SVG: OGraf v1 lower thirds, design tokens, plate styles and <efn-plate>, browser/Node renderer, slant and corner geometry, design data and assets.",
   "type": "module",
