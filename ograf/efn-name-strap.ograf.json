@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
+  "id": "efn-name-strap",
+  "version": "0.3.0",
+  "name": "EFN Name strap",
+  "description": "Navy name plate with the person's name and a beige title plate on the same row. Both plates size to their text. Shown on its own row above the main row, or in the main row in place of the logo box. Replaces the Flowics overlays NAMN1, NAMN2, NAMNSKYLT-EGEN-RAD and NAMNSKYLT.",
+  "author": {
+    "name": "EFN",
+    "url": "https://www.efn.se"
+  },
+  "main": "efn-name-strap.mjs",
+  "supportsRealTime": true,
+  "supportsNonRealTime": true,
+  "stepCount": 1,
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "Name",
+        "label": "Name",
+        "description": "The person's name, on the navy plate.",
+        "gddType": "single-line",
+        "order": 1,
+        "default": "Namn Efternamn",
+        "maxLength": 80
+      },
+      "title": {
+        "type": "string",
+        "title": "Title",
+        "label": "Title",
+        "description": "Role or affiliation, on the beige plate after the name. Leave empty to show the name only.",
+        "gddType": "single-line",
+        "order": 2,
+        "default": "Titel",
+        "maxLength": 120
+      },
+      "row": {
+        "type": "string",
+        "title": "Row",
+        "label": "Row",
+        "description": "Own row: above the main row (logo box and ticker stay on air). Main row: in place of the logo box.",
+        "enum": ["own", "main"],
+        "gddType": "select",
+        "gddOptions": {
+          "labels": {
+            "own": "Own row (above the main row)",
+            "main": "Main row (in place of the logo box)"
+          }
+        },
+        "order": 3,
+        "default": "own",
+        "hidden": true
+      }
+    }
+  },
+  "actionDurations": [
+    { "type": "playAction", "duration": 1200 },
+    { "type": "updateAction", "duration": 0 },
+    { "type": "stopAction", "duration": 870 }
+  ],
+  "renderRequirements": [
+    {
+      "resolution": {
+        "width": { "ideal": 1920 },
+        "height": { "ideal": 1080 }
+      },
+      "frameRate": { "ideal": 50 }
+    }
+  ],
+  "thumbnails": [
+    { "file": "thumbnails/efn-name-strap.png", "resolution": { "width": 1280, "height": 720 } }
+  ],
+  "v_efn": {
+    "flowicsOverlays": ["NAMN1", "NAMN2", "NAMNSKYLT-EGEN-RAD", "NAMNSKYLT"],
+    "canvas": "Designed on a 1920x1080 canvas; scales to any 16:9 output. Render UHD for the sharpest rims."
+  }
+}

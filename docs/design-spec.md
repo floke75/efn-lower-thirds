@@ -83,7 +83,7 @@ A white band sweeps across some plates once per 15 s loop.
   - logo line left 2.8–7.1 s
   - logo line right 6.8–11.1 s
 - **No glint:** beige plates and the location bar.
-- Per-element values are in `components[].glint`. The build uses SMIL on the document timeline. In Flowics the glint is baked into each plate's video, so on air it runs from when the plate is taken in.
+- Per-element values are in `components[].glint`. The glint is SMIL; the OGraf graphics restart its 15 s loop when the plate is taken in, as the Flowics videos did (and seek it in non-real-time rendering).
 
 ## Ticker
 
@@ -129,7 +129,9 @@ One ticker component then replaces all the fixed-width variants.
 
 The name-plate rule in `namePlateWidth()` is **provisional**: at least 588.5 px, growing with the text (0.15em padding each side plus the slanted edge's run). The final fitting rule is still open.
 
-## Animation and states (to implement)
+## Animation and states
+
+Implemented for the name strap (`ograf/efn-name-strap.mjs`); the other graphics follow the same model (`ograf/lib/efn-graphic.mjs`).
 
 The Flowics original's animations are summarised in `design-tokens.json` (`animation`, `states`). The full GSAP preset table is in `reference/flowics/animation-presets.json`. Per-element in/out timings and `updateAnimation` are in `reference/flowics/layout-spec.json`.
 

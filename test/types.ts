@@ -7,7 +7,7 @@ import {
   registry, tokens, efnLogoSvg, wordmarks, sampleTickerPayload,
   geom, shapePath, slantOffset, cornerGeom, f2, esc,
   roundedSkewedCardPathUniform, cardCorners,
-  type Renderer, type Content, type MeasureText, type Shape, type TickerRow, type Component, type LogoBoxVariant,
+  type Renderer, type NameStrap, type Content, type MeasureText, type Shape, type TickerRow, type Component, type LogoBoxVariant,
 } from 'efn-lower-thirds';
 import { createRenderer as createRendererOnly, type RendererOptions } from 'efn-lower-thirds/renderer';
 import { roundedSkewedCardPathUniform as pathOnly, cardCorners as cornersOnly, type CardPosition } from 'efn-lower-thirds/geometry';
@@ -31,6 +31,12 @@ if (title) {
   // @ts-expect-error plate() needs the defs array
   lt.plate(title, 100, 0, 0, {});
 }
+const strapDefs: string[] = [];
+const strap: NameStrap = lt.nameStrap({ name: 'Namn Efternamn', title: 'EFN' }, { measureText: measure, row: 'main', defs: strapDefs });
+const strapMarkup: string = strap.namePlate + strap.nameText + strap.titlePlate + strap.titleText;
+const titleWipe: number | undefined = strap.layout.title?.elementW;
+// @ts-expect-error row is 'own' or 'main'
+lt.nameStrap({ name: 'x' }, { row: 'side' });
 const variant = (registry.components.find(c => c.id === 'logo-box')?.variants ?? [])[0] as LogoBoxVariant;
 const wm: string = lt.wordmark(variant, 11, 956.01);
 const logo: string = lt.efnLogo(917, 1031.5, 86, 37);

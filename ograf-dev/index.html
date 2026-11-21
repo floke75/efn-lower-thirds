@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EFN OGraf dev renderer</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { color-scheme: dark; --ui: #1b1c1f; --panel: #232529; --line: #34363b; --text: #e6e6e6; --muted: #9a9ca3; --ok: #3fb950; --bad: #f85149; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ui); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: grid; gap: 14px; }
+  header { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  /* the renderer output: a 16:9 box the graphic element fills */
+  #stage { position: relative; aspect-ratio: 16 / 9; width: 100%; border: 1px solid var(--line); overflow: hidden; background: #333; }
+  #stage.bg-white { background: #fff; } #stage.bg-checker { background: repeating-conic-gradient(#555 0% 25%, #444 0% 50%) 0 0 / 24px 24px; } #stage.bg-none { background: transparent; border-color: transparent; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px; display: grid; gap: 10px; }
+  .panel h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0; font-weight: 600; }
+  label { display: grid; gap: 4px; color: var(--muted); font-size: 12px; min-width: 200px; }
+  label.check { display: flex; align-items: center; gap: 6px; color: var(--text); font-size: 13px; min-width: 0; }
+  input, select, textarea, button { font: inherit; color: var(--text); background: #2b2d32; border: 1px solid var(--line); border-radius: 4px; padding: 6px 10px; }
+  button { cursor: pointer; } button:hover { border-color: #5b5f66; }
+  textarea { width: 100%; min-height: 90px; font: 12px/1.4 ui-monospace, monospace; }
+  input[type=range] { flex: 1; min-width: 240px; padding: 0; }
+  #log, #results { font: 12px/1.5 ui-monospace, monospace; white-space: pre-wrap; color: var(--muted); max-height: 220px; overflow: auto; margin: 0; }
+  #results .pass { color: var(--ok); } #results .fail { color: var(--bad); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>EFN OGraf dev renderer</h1>
+    <label>Graphic <select id="manifest"></select></label>
+    <label>Background <select id="bg"><option value="grey">Dark grey</option><option value="white">White</option><option value="checker">Checker</option><option value="none">None (transparent)</option></select></label>
+  </header>
+  <div id="stage"></div>
+  <div class="grid2">
+    <section class="panel">
+      <h2>Real-time</h2>
+      <div class="row">
+        <button id="play">Play</button><button id="next">Next (delta 1)</button><button id="stop">Stop</button><button id="update">Update</button>
+        <label class="check"><input type="checkbox" id="skip"> skipAnimation</label>
+        <button id="reload">Reload</button>
+      </div>
+      <form id="data" class="row" autocomplete="off"></form>
+    </section>
+    <section class="panel">
+      <h2>Non-real-time</h2>
+      <textarea id="schedule" spellcheck="false"></textarea>
+      <div class="row"><button id="nrt">Load non-real-time with this schedule</button><input type="range" id="time" min="0" max="8000" step="20" value="0"><span id="timeLabel">0 ms</span></div>
+    </section>
+  </div>
+  <section class="panel">
+    <div class="row"><h2>Conformance</h2><button id="conform">Run OGraf conformance checks</button><span id="summary"></span></div>
+    <pre id="results"></pre>
+  </section>
+  <section class="panel"><h2>Calls</h2><pre id="log"></pre></section>
+</main>
+<script type="module" src="harness.js"></script>
+</body>
+</html>

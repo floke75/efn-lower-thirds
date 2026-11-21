@@ -1,8 +1,8 @@
 {
   "name": "efn-lower-thirds",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
-  "description": "EFN lower thirds as SVG for OGraf: browser/Node renderer, slant and corner geometry, design data and assets.",
+  "description": "EFN lower thirds as SVG for OGraf: OGraf v1 graphics, browser/Node renderer, slant and corner geometry, design data and assets.",
   "type": "module",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -28,16 +28,18 @@
     "lib",
     "data",
     "assets",
-    "docs"
+    "docs",
+    "ograf"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "node scripts/build-assets.js && node scripts/build-svgs.js",
-    "check": "node scripts/build-assets.js --check",
-    "demo": "node scripts/serve.js",
-    "typecheck": "tsc -p tsconfig.json && node scripts/check-exports.js"
+    "build": "node scripts/build-assets.js && node scripts/build-svgs.js && node scripts/build-ograf.js",
+    "check": "node scripts/build-assets.js --check && node scripts/validate-ograf.js && node scripts/check-compat.js",
+    "typecheck": "tsc -p tsconfig.json && node scripts/check-exports.js",
+    "demo": "node scripts/serve.js"
   },
   "devDependencies": {
+    "ajv": "^8.20.0",
     "typescript": "^7.0.2"
   },
   "engines": {

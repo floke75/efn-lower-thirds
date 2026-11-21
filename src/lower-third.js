@@ -19,6 +19,11 @@
 // Geometry: lib/roundedSkewedCardPathUniform.js. px are 1x on the 1920x1080 canvas.
 import { roundedSkewedCardPathUniform, cardCorners } from '../lib/roundedSkewedCardPathUniform.js';
 
+// Plain ES2018 on purpose (no ??, ?., Object.fromEntries, matchAll): runs in Chromium/CEF 69+ playout engines.
+const def = (v, d) => (v === undefined || v === null ? d : v);
+const fromEntries = (pairs) => pairs.reduce((o, kv) => { o[kv[0]] = kv[1]; return o; }, {});
+const allMatches = (s, re) => { const out = []; let m; re.lastIndex = 0; while ((m = re.exec(s))) out.push(m); return out; };
+
 export const f2 = (n) => +(+n).toFixed(2);
 export const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -43,9 +48,9 @@ export function geom(shape, w, x = 0, y = 0, { height } = {}) {
   const ro = slantsRight(shape) ? (o.right || 0) : 0;
   const si = shape.straightInsetPx || {};
   const li = lo ? 0 : (si.left || 0), ri = ro ? 0 : (si.right || 0);
-  return { X: x - lo + li, Y: y + (height == null ? (shape.insetTop || 0) : 0), W: w + lo + ro - li - ri, H: height ?? shape.height };
+  return { X: x - lo + li, Y: y + (height == null ? (shape.insetTop || 0) : 0), W: w + lo + ro - li - ri, H: def(height, shape.height) };
 }
-const rawPath = (shape, X, Y, W, H, radius) => roundedSkewedCardPathUniform({ width: W, height: H, skewDeg: shape.skewDeg, position: shape.position, radius: radius ?? shape.radius, angleComp: shape.angleComp })
+const rawPath = (shape, X, Y, W, H, radius) => roundedSkewedCardPathUniform({ width: W, height: H, skewDeg: shape.skewDeg, position: shape.position, radius: def(radius, shape.radius), angleComp: shape.angleComp })
   .replace(/(-?\d+\.\d+),(-?\d+\.\d+)/g, (m, a, b) => `${f2(+a + X)},${f2(+b + Y)}`);
 // SVG path data of a component's shape at box width w, box top-left (x, y).
 export function shapePath(shape, w, x = 0, y = 0, { height, radius } = {}) {
@@ -53,7 +58,7 @@ export function shapePath(shape, w, x = 0, y = 0, { height, radius } = {}) {
   return rawPath(shape, X, Y, W, H, radius);
 }
 // Horizontal run of a slanted edge over the shape's height.
-export const slantOffset = (shape, h) => (h ?? shape.height) * tanSkew(shape);
+export const slantOffset = (shape, h) => def(h, shape.height) * tanSkew(shape);
 // The same shape with ONLY one edge moved inward by `delta` (negative = outward); the other three edges stay on
 // their lines, so "edge pushed out" + "edge pulled in" (even-odd) is a clean band along that edge.
 function edgeMovedPath(shape, g, edge, delta) {
@@ -85,7 +90,7 @@ export function cornerGeom(shape, g) {
     const prev = pts[(i + 3) % 4], next = pts[(i + 1) % 4];
     const dA = Vec.unit(Vec.sub(prev, P)), dB = Vec.unit(Vec.sub(next, P));
     const theta = Math.acos(Math.max(-1, Math.min(1, Vec.dot(dA, dB))));
-    const tLen = Math.min(shape.radius * Math.pow(1 / Math.tan(theta / 2), shape.angleComp ?? 1), Vec.len(Vec.sub(prev, P)) / 2, Vec.len(Vec.sub(next, P)) / 2);
+    const tLen = Math.min(shape.radius * Math.pow(1 / Math.tan(theta / 2), def(shape.angleComp, 1)), Vec.len(Vec.sub(prev, P)) / 2, Vec.len(Vec.sub(next, P)) / 2);
     const bis = Vec.unit(Vec.add(dA, dB));
     return { P, A: Vec.add(P, Vec.mul(dA, tLen)), B: Vec.add(P, Vec.mul(dB, tLen)), C: Vec.add(P, Vec.mul(bis, shape.radius / Math.sin(theta / 2))),
       nA: outN(prev, P), nB: outN(P, next) };
@@ -164,7 +169,7 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
     const EDGE_A = { TL: 'left', TR: 'top', BR: 'right', BL: 'bottom' }, EDGE_B = { TL: 'top', TR: 'right', BR: 'bottom', BL: 'left' };
     let out = '';
     for (let k = N - 1; k >= 0; k--) {
-      const dep = Object.fromEntries(EDGES.map(e => [e, layerOf(e, k).depth]));
+      const dep = fromEntries(EDGES.map(e => [e, layerOf(e, k).depth]));
       const meanDep = EDGES.reduce((a, e) => a + dep[e], 0) / 4;
       const cid = nid('ring');
       defs.push(`<clipPath id="${cid}"><path clip-rule="evenodd" d="${outer} ${insetPath(shape, gm, dep, shape.radius - meanDep)}"/></clipPath>`);
@@ -219,7 +224,7 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
     const gm = geom(shape, w, x, y, { height });
     const d = rawPath(shape, gm.X, gm.Y, gm.W, gm.H);
     const paint = fillPaint(fill, defs);
-    const box = `x="${f2(x - 6)}" y="${f2(y - 6)}" width="${f2(w + 12)}" height="${f2((height ?? shape.height) + 12 + (shape.insetTop || 0))}"`;
+    const box = `x="${f2(x - 6)}" y="${f2(y - 6)}" width="${f2(w + 12)}" height="${f2(def(height, shape.height) + 12 + (shape.insetTop || 0))}"`;
     const sil = nid('sil');
     defs.push(`<mask id="${sil}" maskUnits="userSpaceOnUse" ${box}><path d="${d}" fill="#fff"/></mask>`);
     let g = `<path d="${d}" fill="${paint}"/>`;
@@ -294,7 +299,7 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
     if (!cw || !cw.supplied || !cw.placement) return '';
     const txt = wordmarks[v.id];
     if (!txt) throw new Error(`createRenderer: wordmarks.${v.id} (${cw.file}) was not provided`);
-    const d = [...txt.matchAll(/<path\b[^>]*?\bd="([^"]+)"/g)].map(m => m[1]).join(' ');
+    const d = allMatches(txt, /<path\b[^>]*?\bd="([^"]+)"/g).map(m => m[1]).join(' ');
     if (!d) throw new Error('no path data in ' + cw.file);
     const p = cw.placement;
     return `<g data-slot="wordmark" data-wordmark="${v.id}" filter="url(#${id('wordmarkInset')})"><path d="${d}" fill="${comp('logo-box').wordmark.fill}" transform="translate(${f2(bx + p.tx)},${f2(by + p.ty)}) scale(${p.scale})"/></g>`;
@@ -319,6 +324,46 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
   // Without a measureText hook (e.g. Node) text advances are estimated; "EFN" was measured at 42 px.
   const estimateWidth = (text, size) => (text === 'EFN' ? 81.8 : text.length * 0.62 * 42) * size / 42;
 
+  // ---------- name strap: name plate + title plate on one row ----------
+  // Returns the four parts separately so a graphic can animate them, plus the layout it used:
+  //   { namePlate, nameText, titlePlate, titleText, layout }   (titlePlate/titleText are '' when title is '')
+  // content: { name, title }. options: measureText (sizes the plates from the text, see composite()),
+  //          row: 'own' (y 880.41, above the main row) | 'main' (y 956.01, in place of the logo box), defs.
+  // Fitting (with measureText): the name plate keeps at least its Flowics width and grows with the name; the
+  // title box hugs its text (0.5em + text + 0.8em). If both don't fit between the safe edges, the title keeps up
+  // to 40% of the row and the fonts shrink to fit, as Flowics' fitOneLine / fitContainer do.
+  function nameStrap(content = {}, { measureText, row = 'own', defs } = {}) {
+    const rows = REG.rows, np = comp('name-plate'), tp = comp('title-plate');
+    const t = np.text, tt = tp.text, nfs0 = t.effectiveSizePx, tfs0 = tt.effectiveSizePx;
+    const y = row === 'main' ? rows.mainRow.y : rows.ownRow.y;
+    const name = def(content.name, ''), title = def(content.title, '');
+    const x0 = np.layout.x, right = rows.safeRight, overlap = REG.adjacentPlateOverlapPx;
+    const padN = (t.linePaddingEm.left + t.linePaddingEm.right) * nfs0 + slantOffset(np.shape);
+    const padT = (tt.linePaddingEm.left + tt.linePaddingEm.right) * tfs0;
+    const nameAdv = measureText ? measureText(name, { weight: t.weight, sizePx: nfs0 }) : null;
+    const titleAdv = !title ? 0 : measureText ? measureText(title, { weight: tt.weight, sizePx: tfs0 }) : estimateWidth(title, tfs0);
+    let nameW = measureText ? namePlateWidth(nameAdv) : np.flowicsSize.w, nfs = nfs0, tfs = tfs0, tw = title ? padT + titleAdv : 0;
+    if (measureText) {
+      const avail = right - x0 + (title ? overlap : 0);
+      const nameMax = title ? Math.max(np.flowicsSize.w, avail - Math.min(tw, avail * 0.4)) : avail;
+      if (nameW > nameMax) { nameW = nameMax; nfs = nfs0 * Math.min(1, (nameW - padN) / nameAdv); }
+      const titleRoom = avail - nameW;
+      if (title && tw > titleRoom) { const s = titleRoom / (padT + titleAdv); tfs = tfs0 * s; tw = titleRoom; }
+    }
+    const out = { namePlate: plate(np, nameW, x0, y, { defs }), titlePlate: '', titleText: '' };
+    out.nameText = `<text data-slot="name" x="${f2(x0 + t.linePaddingEm.left * nfs0)}" y="${f2(y + t.box.y + t.box.h / 2)}" dominant-baseline="central" font-weight="700" font-size="${f2(nfs)}" fill="${t.color}">${esc(name)}</text>`;
+    const layout = { y, name: { x: x0, w: nameW, textBoxW: nameW - 13.5, fontPx: f2(nfs) }, title: null };
+    if (title) {
+      const tx = x0 + nameW - overlap;   // = 595.0 in Flowics: the title starts 4.5 px before the name box ends
+      const ty = y + tp.layout.yOffsetInRow;
+      out.titlePlate = plate(tp, tw, tx, ty, { defs });
+      out.titleText = `<text data-slot="title" x="${f2(tx + tt.linePaddingEm.left * tfs)}" y="${f2(ty + tp.shape.insetTop + tp.shape.height / 2)}" dominant-baseline="central" font-weight="700" font-size="${f2(tfs)}" fill="${tt.color}">${esc(title)}</text>`;
+      layout.title = { x: tx, y: ty, w: tw, elementW: right - tx, fontPx: f2(tfs) };
+    }
+    out.layout = layout;
+    return out;
+  }
+
   // ---------- full lower third ----------
   // content: { name, title, logo (logo-box variant id), page (4 ticker rows), clock, date }
   // options: measureText(text, { weight, sizePx }) -> advance in px (browser: canvas measureText) sizes the
@@ -329,24 +374,14 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
     const defs = [logoFilters];
     let body = '';
     const rows = REG.rows;
-    const name = content.name ?? 'Namn Efternamn', title = content.title ?? 'EFN', logoId = content.logo ?? 'borslunch', page = content.page ?? [];
+    const name = def(content.name, 'Namn Efternamn'), title = def(content.title, 'EFN'), logoId = def(content.logo, 'borslunch'), page = def(content.page, []);
     // back gradient
     { const L = comp('logo-line-back-gradient').layout;
       defs.push(`<linearGradient id="${id('backgrad')}" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity="0.2"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>`);
       body += `<rect data-component="logo-line-back-gradient" x="${L.x}" y="${L.y}" width="${L.w}" height="${L.h}" fill="url(#${id('backgrad')})"/>`; }
     // name + title
-    { const np = comp('name-plate'), y = rows.ownRow.y, t = np.text, fs_ = t.effectiveSizePx;
-      const w = measureText ? namePlateWidth(measureText(name, { weight: t.weight, sizePx: fs_ })) : np.flowicsSize.w;
-      body += plate(np, w, np.layout.x, y, { defs });
-      body += `<text data-slot="name" x="${f2(np.layout.x + t.linePaddingEm.left * fs_)}" y="${f2(y + t.box.y + t.box.h / 2)}" dominant-baseline="central" font-weight="700" font-size="${fs_}" fill="${t.color}">${esc(name)}</text>`;
-      // title: starts adjacentPlateOverlapPx (4.5) before the name box ends; width hugs the text
-      const tp = comp('title-plate'), tt = tp.text, tfs = tt.effectiveSizePx;
-      const textW = measureText ? measureText(title, { weight: tt.weight, sizePx: tfs }) : estimateWidth(title, tfs);
-      const tx = np.layout.x + w - REG.adjacentPlateOverlapPx;   // = 595.0 in Flowics
-      const tw = titleWidth(textW);
-      const ty = y + tp.layout.yOffsetInRow;
-      body += plate(tp, tw, tx, ty, { defs });
-      body += `<text data-slot="title" x="${f2(tx + tt.linePaddingEm.left * tfs)}" y="${f2(ty + tp.shape.insetTop + tp.shape.height / 2)}" dominant-baseline="central" font-weight="700" font-size="${tfs}" fill="${tt.color}">${esc(title)}</text>`; }
+    { const ns = nameStrap({ name, title }, { measureText, row: 'own', defs });
+      body += ns.namePlate + ns.nameText + ns.titlePlate + ns.titleText; }
     // logo box + ticker
     { const lb = comp('logo-box'), v = lb.variants.find(x => x.id === logoId), y = rows.mainRow.y;
       if (!v) throw new Error(`unknown logo-box variant "${logoId}"`);
@@ -393,8 +428,8 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
       body += plate(L, L.layout.w, L.layout.x, y, { defs });
       body += plate(R, R.layout.w, R.layout.x, y, { defs });
       const lg = comp('logo-line-logo').layout; body += efnLogo(lg.x + 2, lg.y + 1, lg.w - 4, lg.h - 2);
-      body += `<text data-slot="clock" x="${f2(L.layout.x + L.text.offsetX)}" y="${f2(y + 18.5)}" dominant-baseline="central" font-weight="700" font-size="23" fill="${L.text.color}">${esc(content.clock ?? '')}</text>`;
-      body += `<text data-slot="date" x="${f2(R.layout.x + R.layout.w - R.text.insetRight)}" y="${f2(y + 18.5)}" text-anchor="end" dominant-baseline="central" font-weight="700" font-size="23" fill="${R.text.color}">${esc(content.date ?? '')}</text>`; }
+      body += `<text data-slot="clock" x="${f2(L.layout.x + L.text.offsetX)}" y="${f2(y + 18.5)}" dominant-baseline="central" font-weight="700" font-size="23" fill="${L.text.color}">${esc(def(content.clock, ''))}</text>`;
+      body += `<text data-slot="date" x="${f2(R.layout.x + R.layout.w - R.text.insetRight)}" y="${f2(y + 18.5)}" text-anchor="end" dominant-baseline="central" font-weight="700" font-size="23" fill="${R.text.color}">${esc(def(content.date, ''))}</text>`; }
     return svgDocument(1920, 1080, defs, body, { fontsUrl, fluid });
   }
 
@@ -417,7 +452,7 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
       const shape = opts.shape || c.shape;
       let body = plate(c, w, 0, 0, { ...opts, defs });
       if (opts.wordmark) { const wm = wordmark(opts.wordmark, 0, 0); if (wm) { defs.push(logoFilters); body += wm; } }
-      out.push({ file, svg: svgDocument(w, c.boxHeight ?? (shape.insetTop || 0) + shape.height, defs, body) });
+      out.push({ file, svg: svgDocument(w, def(c.boxHeight, (shape.insetTop || 0) + shape.height), defs, body) });
     }
     // value boxes (feed colours) and column ramps
     const c = comp('ticker-value-box');
@@ -438,6 +473,6 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
     return out;
   }
 
-  return { comp, resetIds, plate, logoFilters, efnLogo, wordmark, svgDocument, titleWidth, namePlateWidth, composite, elements,
+  return { comp, resetIds, plate, logoFilters, efnLogo, wordmark, svgDocument, titleWidth, namePlateWidth, nameStrap, composite, elements,
     geom, shapePath, slantOffset, cornerGeom };
 }

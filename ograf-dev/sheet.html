@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EFN OGraf animation sheet</title>
+<link rel="icon" href="data:,">
+<style>
+  body { margin: 0; background: #1b1c1f; color: #cfd1d6; font: 13px/1.3 ui-monospace, monospace; }
+  .frame { position: relative; display: flex; align-items: stretch; border-bottom: 1px solid #2c2e33; }
+  .t { width: 96px; flex: none; padding: 8px; box-sizing: border-box; }
+  .band { position: relative; flex: none; width: var(--w); height: var(--h); overflow: hidden; background: #333; }
+  .band > .canvas { position: absolute; left: calc(-1 * var(--x)); top: calc(-1 * var(--y)); width: 1920px; height: 1080px; }
+</style>
+</head>
+<body>
+<script type="module">
+// Animation contact sheet: one non-real-time instance per timestamp, each cropped to a band of the 1920x1080
+// canvas. ?manifest=<url>&data=<json>&times=0,450,...&in=0&out=3000&band=x,y,w,h (default: the own row)
+// Sets window.__sheetReady when all frames are rendered.
+import { tagFor } from './conformance.js';
+const q = new URLSearchParams(location.search);
+const [bx, by, bw, bh] = (q.get('band') || '0,860,900,104').split(',').map(Number);
+document.body.style.cssText += `--x:${bx}px;--y:${by}px;--w:${bw}px;--h:${bh}px`;
+try {
+  const manifestHref = new URL(q.get('manifest') || '../ograf/efn-name-strap.ograf.json', location.href).href;
+  const manifest = await (await fetch(manifestHref, { cache: 'no-store' })).json();
+  const Graphic = (await import(new URL(manifest.main, manifestHref).href)).default;
+  const tag = tagFor(Graphic, 'efn-sheet');
+  const schedule = [{ timestamp: Number(q.get('in') || 0), action: { type: 'playAction', params: { goto: 0 } } }];
+  if (q.has('out')) schedule.push({ timestamp: Number(q.get('out')), action: { type: 'stopAction', params: {} } });
+  for (const t of (q.get('times') || '0,500,1000,1500').split(',').map(Number)) {
+    const row = document.createElement('div'); row.className = 'frame';
+    row.innerHTML = `<div class="t">${t} ms</div><div class="band"><div class="canvas"></div></div>`;
+    document.body.append(row);
+    const el = document.createElement(tag);
+    row.querySelector('.canvas').append(el);
+    await el.load({ data: JSON.parse(q.get('data') || '{}'), renderType: 'non-realtime', renderCharacteristics: { resolution: { width: 1920, height: 1080 } } });
+    await el.setActionsSchedule({ schedule });
+    await el.goToTime({ timestamp: t });
+  }
+  await document.fonts.ready;
+  await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+  window.__sheetReady = true;
+} catch (e) { window.__sheetError = String(e && e.stack || e); }
+</script>
+</body>
+</html>

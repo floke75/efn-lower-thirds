@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EFN OGraf frame</title>
+<link rel="icon" href="data:,">
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+  body.bg-grey { background: #333; } body.bg-white { background: #fff; }
+</style>
+</head>
+<body>
+<script type="module">
+// Renders ONE frame of a graphic, full viewport, the way a non-real-time renderer does: load(non-realtime),
+// setActionsSchedule(play at `in`, optional stop at `out`), goToTime(t). Used for thumbnails and visual checks.
+// ?manifest=<url>&data=<json>&t=<ms>&in=<ms, default 0>&out=<ms>&bg=transparent|grey|white
+// Sets window.__frameReady = true (or window.__frameError) when the frame is on screen.
+import { tagFor } from './conformance.js';
+const q = new URLSearchParams(location.search);
+document.body.className = `bg-${q.get('bg') || 'transparent'}`;
+try {
+  const manifestHref = new URL(q.get('manifest') || '../ograf/efn-name-strap.ograf.json', location.href).href;
+  const manifest = await (await fetch(manifestHref, { cache: 'no-store' })).json();
+  const Graphic = (await import(new URL(manifest.main, manifestHref).href)).default;
+  const el = document.createElement(tagFor(Graphic, 'efn-frame'));
+  document.body.append(el);
+  await el.load({ data: JSON.parse(q.get('data') || '{}'), renderType: 'non-realtime', renderCharacteristics: { resolution: { width: innerWidth, height: innerHeight } } });
+  const schedule = [{ timestamp: Number(q.get('in') || 0), action: { type: 'playAction', params: { goto: 0 } } }];
+  if (q.has('out')) schedule.push({ timestamp: Number(q.get('out')), action: { type: 'stopAction', params: {} } });
+  await el.setActionsSchedule({ schedule });
+  const r = await el.goToTime({ timestamp: Number(q.get('t') || 5000) });
+  if (r && r.statusCode !== 200) throw new Error(JSON.stringify(r));
+  await document.fonts.ready;
+  await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+  window.__frameReady = true;
+} catch (e) { window.__frameError = String(e && e.stack || e); }
+</script>
+</body>
+</html>

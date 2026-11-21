@@ -85,6 +85,28 @@ export interface PlateOptions {
 
 export interface Geometry { X: number; Y: number; W: number; H: number }
 
+export interface NameStrapOptions {
+  measureText?: MeasureText;
+  /** 'own': y 880.41, above the main row (default). 'main': y 956.01, in place of the logo box. */
+  row?: 'own' | 'main';
+  /** Receives the parts' <defs> entries. */
+  defs?: string[];
+}
+
+export interface NameStrap {
+  namePlate: string;
+  nameText: string;
+  /** '' when the title is empty */
+  titlePlate: string;
+  titleText: string;
+  layout: {
+    y: number;
+    name: { x: number; w: number; textBoxW: number; fontPx: number };
+    /** null when the title is empty. elementW: the title element's width to the safe right edge (its wipe width). */
+    title: { x: number; y: number; w: number; elementW: number; fontPx: number } | null;
+  };
+}
+
 export interface RendererOptions {
   registry: Registry;
   tokens: Tokens;
@@ -110,6 +132,8 @@ export interface Renderer {
   titleWidth(textWidth: number): number;
   /** Name plate width for a text advance (provisional rule: at least the Flowics 588.5 px). */
   namePlateWidth(textWidth: number): number;
+  /** Name plate + title plate on one row, as separate parts (for animating them). */
+  nameStrap(content?: { name?: string; title?: string }, options?: NameStrapOptions): NameStrap;
   /** The full lower third as one SVG document. */
   composite(content?: Content, options?: CompositeOptions): string;
   /** Every plate at its Flowics size, without text. */
