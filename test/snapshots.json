@@ -1,0 +1,258 @@
+{
+  "composite/flowics-widths": {
+    "sha256": "6aa5aa19d3a9771c44eca6a106dc007609e0706cfc9a463e32b7d56b9105fec1",
+    "bytes": 222361
+  },
+  "composite/measured": {
+    "sha256": "781143dac92c8441dd20de5fac7d1d5dc0269a9fe8343f1a75d1254694901416",
+    "bytes": 219602
+  },
+  "elements/location-plate": {
+    "sha256": "82b6b88eb4afa35d6ecc64f7818e342a0e745214d7dd401b19fe9bca22c7eae5",
+    "bytes": 34855
+  },
+  "elements/location-plate--split-right": {
+    "sha256": "59aea35fd335579cb7b32d57871ac7c857543f7be4e17c03ff9e287d18352abe",
+    "bytes": 34928
+  },
+  "elements/logo-box--borsfrukost": {
+    "sha256": "5265ca2299ef980ce1d695e7d00c033e600268ce8b4c1d782aa1394c892bc547",
+    "bytes": 36474
+  },
+  "elements/logo-box--borslunch": {
+    "sha256": "19b979695722eaeddc954162174ddbc5d80e319539f95e834f37bcdf286fdd30",
+    "bytes": 45283
+  },
+  "elements/logo-box--direkt": {
+    "sha256": "9af95fc0d7e2b822452e20ef61ae69ad5c1a0c06bcc0a7bce966061462a8d057",
+    "bytes": 42278
+  },
+  "elements/logo-box--marknad": {
+    "sha256": "b77d323ae957439fe94a9482fd73e4473e2aa071e9f5f11d36bdae05aad76f2b",
+    "bytes": 36474
+  },
+  "elements/logo-box--morgon": {
+    "sha256": "ddfea3ba8ca9bdabfbfd9c282d5db4d1150e3bc938f07b65d0496149971d20f5",
+    "bytes": 43500
+  },
+  "elements/logo-box--nobel": {
+    "sha256": "274594d74ecc5a19fec378f98ea9b3703f932bfd3ac72ddae889322266389172",
+    "bytes": 60428
+  },
+  "elements/logo-box--ravaror": {
+    "sha256": "b6335df699ba297838fed12ad7c262512cb3b9ba8128f27dcf0128106f4a7be1",
+    "bytes": 43194
+  },
+  "elements/logo-box--update": {
+    "sha256": "63bf7defa38259b2f4b222c6d4b476199547135c14f9af5d47c44e8c2eab8353",
+    "bytes": 36480
+  },
+  "elements/logo-line-left": {
+    "sha256": "c1fd9405620c2865503d5ba0635df2d3915d39dae5f7ea6f784ebb7253a403a6",
+    "bytes": 27688
+  },
+  "elements/logo-line-logo": {
+    "sha256": "96f80b975c51778a9cc41ff2e31ee4c6bcc7f9e97443cabcd02030a496b99a70",
+    "bytes": 4768
+  },
+  "elements/logo-line-right": {
+    "sha256": "4bae40d93669684ed4e758b8dfb38d016e0aa0f14c65b81cf6ba37a0e72f5035",
+    "bytes": 36138
+  },
+  "elements/name-plate": {
+    "sha256": "b18cfc7d7c8d3922b6b49c8b6dca429ba2a157299952976cf0cebdbe522be1d3",
+    "bytes": 36624
+  },
+  "elements/ticker-column-ramp": {
+    "sha256": "93297c00fa45d8399361756706c27289c19271742d397d48dec340a7bbd0c493",
+    "bytes": 414
+  },
+  "elements/ticker-column-ramp--last": {
+    "sha256": "0c45a355d36dde17cb012d97089076cf22e89cca4bf69f8219c0bd5e644cac48",
+    "bytes": 512
+  },
+  "elements/ticker-plate--borsfrukost": {
+    "sha256": "c3d9b69220dc3021c42eafd6e4aab913ebb0cf65a6fb7a9e4038d8513329e45b",
+    "bytes": 31383
+  },
+  "elements/ticker-plate--borslunch": {
+    "sha256": "a93addc9aee6af418ea2ebef35d24a082aba899ab8d4ddb6625df41b2a9584c2",
+    "bytes": 31428
+  },
+  "elements/ticker-plate--direkt": {
+    "sha256": "ef6db699b88e87b10d260cdf3d703cf942f3055722d5828751b2d7c8bfcf1cc7",
+    "bytes": 31428
+  },
+  "elements/ticker-plate--marknad": {
+    "sha256": "e75f025801c20085829f9bb77c27e7cf85c0f12a6de34d8113289a6abbcec22d",
+    "bytes": 31361
+  },
+  "elements/ticker-plate--ravaror": {
+    "sha256": "dc7aa9dbddaf02af9f5d44a14d139cc4ad6521a9ccfebfaf8a624a17f83087f0",
+    "bytes": 31361
+  },
+  "elements/ticker-plate--update": {
+    "sha256": "0b5ca97a409e65fbad5e933184d9b4ef99a8c4b1b48d26f403f08082554eb9e0",
+    "bytes": 31383
+  },
+  "elements/ticker-value-box--down": {
+    "sha256": "8532537a08bdd8d6130553eafed5863f2f190f06765743d0d8019c8dd89abfa3",
+    "bytes": 736
+  },
+  "elements/ticker-value-box--neutral": {
+    "sha256": "f486814d45af20bd8bc7d395547a51a063c48eca349bf46582abaf10183de44c",
+    "bytes": 739
+  },
+  "elements/ticker-value-box--up": {
+    "sha256": "f0e9f4d1f317b4024a1abab15b6d345a1c9e13a739e9f7f62352a3e9495e8f55",
+    "bytes": 737
+  },
+  "elements/title-plate": {
+    "sha256": "cc3376609d95eb2cddd0d815d4301798c708ce7791e3cabb6284c46db3cce6ec",
+    "bytes": 31044
+  },
+  "exact/composite": {
+    "sha256": "1c25f5a535117685976ba21594ea2b45ab387fc5290a5cd8a0d857c7d7ceb54a",
+    "bytes": 209057
+  },
+  "exact/composite-measured": {
+    "sha256": "f29ed69afe1e7d7e3bfae23538f027fd8302c71920cda2ec2666983e544dd991",
+    "bytes": 206269
+  },
+  "exact/plates-beige": {
+    "sha256": "5a0d73ea6ac8531e9bcfd9cd4cee6b7f7f0a6698b2962b4a2a4cb9ff007974fd",
+    "bytes": 26037
+  },
+  "exact/plates-beige-light": {
+    "sha256": "0b1e90cbedd7177cb674ff29a44038a2f6eadbaa3e791ebc129a47910da86845",
+    "bytes": 26082
+  },
+  "exact/plates-navy": {
+    "sha256": "45cc5065f8cc2b7fc0575b1be25ddfc6d91e8d8af9765aaa16546f9f48f17b82",
+    "bytes": 34850
+  },
+  "logo-ticker/borsfrukost": {
+    "sha256": "d443ddfcf9662ee356897ed3848941519691f3756fae1388f4ce962f77f930d2",
+    "bytes": 82178
+  },
+  "logo-ticker/borslunch": {
+    "sha256": "ae7aa860b5be9c9d139080465de324cc4c148eabc1ed238195f70d85c01a0f19",
+    "bytes": 88325
+  },
+  "logo-ticker/direkt": {
+    "sha256": "3232c58b4afd767d04a153fcdc5a4e0f00f222902abda54573f216b0d4f1dec2",
+    "bytes": 85315
+  },
+  "logo-ticker/marknad": {
+    "sha256": "f985199b58ed790fece4a9893fd2514bc6fddb9636cf1d9bcd97f33b0f96efea",
+    "bytes": 82188
+  },
+  "logo-ticker/morgon": {
+    "sha256": "1f779bbc7f28b861409820f893bbe547fb7038a9d87ff8301e215716c9baaf10",
+    "bytes": 86540
+  },
+  "logo-ticker/nobel": {
+    "sha256": "c5966e4d7b42425553091f8ce5f972679ec2c5560b4274a21ba02a92f622bc6c",
+    "bytes": 103768
+  },
+  "logo-ticker/ravaror": {
+    "sha256": "db7005277ab27c4020fca714e62472e9cd0a0f2440f35df91356fe78fcc74e3b",
+    "bytes": 86234
+  },
+  "logo-ticker/update": {
+    "sha256": "5904552f0ac5e4ff7f3afca58d69f928f090dfa276f1e4a2aa0c9b1d6496eafc",
+    "bytes": 82160
+  },
+  "name-strap/main-long": {
+    "sha256": "12d391832e5515e1c538c26ac24a6a556c10f6bf3527020d384e21137b9025cb",
+    "bytes": 72520
+  },
+  "name-strap/no-title": {
+    "sha256": "5e3c4be9c9a0a6910108a87390169bed4f8785a4cbc8b36910a457a101e80757",
+    "bytes": 40020
+  },
+  "name-strap/own": {
+    "sha256": "d38c0e9460b82d19086f1f299289f9cc2a05ac96fd040710ddff48adb58845ea",
+    "bytes": 71965
+  },
+  "plates/beige": {
+    "sha256": "46f50f423e9817f919119d1c8a219069849ee4f039af1988e1052927c7bcce29",
+    "bytes": 30925
+  },
+  "plates/beige-light": {
+    "sha256": "52b785ab6dbfc2d0beb89124298ca4e99073c00b97796545042a4fc89954b8ec",
+    "bytes": 30982
+  },
+  "plates/beige-radius-0": {
+    "sha256": "0b0b9adaef18b7813aa59f1533c9ce296e0501be8026fb97a22d6646dc5bf95e",
+    "bytes": 30231
+  },
+  "plates/gold": {
+    "sha256": "434941700525e646f271afabf69263017d081cbd8878a347c4f9a18aa75e35d8",
+    "bytes": 52404
+  },
+  "plates/gold-glint": {
+    "sha256": "54be026705efcec0a78fd75e984598f80b3c56b5be0ff976dc677a07bcd160a7",
+    "bytes": 53753
+  },
+  "plates/line-left": {
+    "sha256": "8c29669f844d63584d8709626f752295410208dfa693d65593d721795e14c594",
+    "bytes": 26119
+  },
+  "plates/line-left-glint": {
+    "sha256": "3bc8ca0e7c28ba86526d5f322486e24987c303e8d0db96698af75c9f19bfa3a4",
+    "bytes": 27466
+  },
+  "plates/line-right": {
+    "sha256": "0e84c295a321ecf11cd1fc637eff3f3e355a10a6bfc8c98e8a79eff3f3cf88a5",
+    "bytes": 34576
+  },
+  "plates/line-right-glint": {
+    "sha256": "748e5834328d0c47d13b7a440b0ab8953a79966a35729bf314e93b9437b7f1cd",
+    "bytes": 35920
+  },
+  "plates/location": {
+    "sha256": "7f55d2998d9e0461fb0918822650d6db3512958b6c82b991b2da091149792c1c",
+    "bytes": 34629
+  },
+  "plates/navy": {
+    "sha256": "45cc5065f8cc2b7fc0575b1be25ddfc6d91e8d8af9765aaa16546f9f48f17b82",
+    "bytes": 34850
+  },
+  "plates/navy-glint": {
+    "sha256": "e4ca8e0524441250eb719887d62fe135e61719ac7fdd38012c4b50031bb8cbc1",
+    "bytes": 36195
+  },
+  "plates/navy-h110": {
+    "sha256": "81544a51729252530891b0e810cf41e911e424a137bf65a12db258b943e031c0",
+    "bytes": 34804
+  },
+  "plates/navy-h37": {
+    "sha256": "999261df29b43e02edf08387479516b8fad437d1adfbca915101a134aa0ca13e",
+    "bytes": 34633
+  },
+  "plates/navy-slant-both": {
+    "sha256": "eae076f0b202ca6c1b9336b1ea6c2b739ff39c6ad8042245deb2180a8a8ebf50",
+    "bytes": 35131
+  },
+  "plates/navy-slant-left": {
+    "sha256": "02a6a8c2c435b36ebba0e571b590e42b882cda72dbed597569b4569721f50d2d",
+    "bytes": 34871
+  },
+  "plates/navy-slant-none": {
+    "sha256": "c1363107cb2829b3d988858a08729fe3f0643851da5e6f9879affcfd9448c62d",
+    "bytes": 34591
+  },
+  "plates/navy-slant-right": {
+    "sha256": "a6666d4587bff16963d6969e1cae341d0c431e698a7085b6822b928be5be0e12",
+    "bytes": 34850
+  },
+  "plates/red": {
+    "sha256": "5a8d81541b72a090da1b85a16147c8e990ec5451b1afc536ea1cf344205833a8",
+    "bytes": 34649
+  },
+  "plates/red-glint": {
+    "sha256": "01b0da7eddc7962d59707d223c8600003fedc398ff158e916709070cbd4db730",
+    "bytes": 35998
+  }
+}

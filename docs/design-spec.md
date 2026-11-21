@@ -4,6 +4,8 @@ The rules the SVG build follows. Every value comes from the Flowics graphic "Ny 
 
 px are **1×** on the 1920×1080 canvas.
 
+For building new graphics, the same values are available as named design tokens (`designTokens`, `tokens/efn.css`, `tokens/efn.tokens.json`), generated from the registry by `scripts/build-tokens.js`. The plate looks are available at any size as plate styles (`stylePlate()`, `<efn-plate>`). See "Design system" in the README.
+
 ## Layout
 
 | Row | y | height | Content |
@@ -170,6 +172,29 @@ Render at **UHD (3840×2160) and downscale 2×2 to 1080p**:
 - native 1080p rendering adds coloured sub-pixel fringes to text
 
 Rendered this way, the full lower third differs from the Flowics original by a mean of 3.2–3.8 out of 255. What's left is hairline anti-aliasing on plate and letter edges, plus sub-pixel offsets in the Flowics page's own 1080p render.
+
+## Refinements (EFN additions)
+
+Not part of the Flowics original: designed on top of the measured look, on by default, and switchable off (`refinements: false`) for the exact replica. Parameters: `data/design-tokens.json` → `refinements`.
+
+- **Text shading** (an SVG filter per text colour):
+  - a soft ambient shadow and a tight contact shadow, offset down-right;
+  - the light caught by each glyph's top-left inner edge (rim);
+  - a slight darkening of its bottom-right inner edge (shade).
+
+  The EFN logo and the programme wordmarks get the light-text version on top of their measured treatment.
+
+  The light-text version (navy, red and the value boxes) uses black shadows. The dark-text version (beige) uses warm, lighter shadows and a fainter rim, so dark letters never get a light outline. The light version replaces the Flowics value-box shadow.
+- **Dark text weight:** the shading made bold dark text (title, ticker names) look heavy, so it is drawn lighter: AkkuratStd 400 with a 0.03 em stroke in the text colour, a synthetic semibold (the font only ships 400 and 700). The plates still size from the text.
+- **Beige vignette:** title, ticker and text-line plates burn in towards their edges.
+  - **Colour:** the plate's own colour, not a grey overlay. A gamma curve (`burn`) darkens it with more contrast and a saturation boost (`saturate`) enriches it, so the sand gets deeper and warmer.
+  - **Shape:** the strength at distance d from the nearest edge of the plate's silhouette has two parts that add up to `opacity` at the edge:
+    - a long, gentle ramp, (1 − `edgeShare`) × (1 − d / `width`)^`curve`, over `width` px;
+    - a narrow edge band, `edgeShare` × exp(−d / `edgeWidth`), that brings it to full strength only in the last few px.
+
+    So the burn stays gradual until close to the edge and never reads as a frame. It is shifted slightly towards the light at the upper left.
+  - **Corners:** the distance is measured per axis (left/right and slanted edges, top/bottom) and the stronger one wins, so a corner is never darker than the edges beside it.
+  - **Layering:** it sits under the narrow rims, so the two read as one deeper bevel.
 
 ## Not covered yet
 

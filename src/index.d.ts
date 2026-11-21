@@ -125,6 +125,59 @@ export interface LogoTicker {
   };
 }
 
+export type PlateStyleName = 'navy' | 'location' | 'red' | 'gold' | 'beige' | 'beige-light' | 'line-left' | 'line-right';
+/** Which sides of a plate are slanted. */
+export type Slant = 'right' | 'left' | 'both' | 'none';
+
+/** A measured plate look (see Renderer.plateStyle). */
+export interface PlateStyle {
+  /** registry component the look comes from */
+  component: Component;
+  fill: unknown;
+  bevel: unknown;
+  /** null when the plate has no glint */
+  glint: unknown | null;
+  slant: Slant;
+  radius: number;
+  /** measured plate height in px */
+  height: number;
+  /** text colour used on it */
+  textColor: string;
+}
+
+export interface StylePlateOptions {
+  width: number;
+  /** default: the style's measured height */
+  height?: number;
+  x?: number;
+  y?: number;
+  /** default: the style's own */
+  slant?: Slant;
+  /** default: the style's measured radius */
+  radius?: number;
+  /** true: the style's glint (if it has one), travel scaled to the width */
+  glint?: boolean;
+  /** receives the plate's <defs> entries */
+  defs: string[];
+}
+
+/** One layer of the refinements' SVG shading: offset, gaussian blur (stdDeviation), colour and opacity. */
+export interface FilterLayer { dx: number; dy: number; blur: number; color: string; opacity: number }
+/** Text shading: ambient and contact drop shadows, rim light (top-left inner edge), shade (bottom-right inner edge). */
+export interface TextShading { ambient: FilterLayer; contact: FilterLayer; rim: FilterLayer; shade: FilterLayer }
+/** EFN's additions to the measured look (tokens.refinements). */
+export interface Refinements {
+  textLight: TextShading;
+  textDark: TextShading;
+  /** bold dark text (title, ticker names): this weight plus a stroke of strokeEm (em) in the text colour */
+  darkText?: { weight: number; strokeEm: number };
+  /** the listed components' plates (the beige ones) burn in towards their edges: strength at distance d = opacity x
+   *  [(1 - edgeShare) x (1 - d / width)^curve + edgeShare x exp(-d / edgeWidth)]; dx/dy = shift towards the light,
+   *  burn = gamma exponent, saturate = saturation boost */
+  vignette: { components: string[]; width: number; curve?: number; edgeShare?: number; edgeWidth?: number; cornerSoftness?: number; dx: number; dy: number; burn: number; saturate: number; opacity: number };
+  [key: string]: unknown;
+}
+
 export interface RendererOptions {
   registry: Registry;
   tokens: Tokens;
@@ -134,11 +187,19 @@ export interface RendererOptions {
   wordmarks?: Record<string, string>;
   /** Prefix for every SVG id, to keep ids unique when several SVGs share one HTML document. */
   idPrefix?: string;
+  /** EFN's refinements (text shading, beige vignette). Default true; false draws the exact Flowics replica. */
+  refinements?: boolean;
 }
 
 export interface Renderer {
   comp(id: string): Component | undefined;
   resetIds(): void;
+  /** The refinement parameters in use, or null when refinements are off. */
+  refinements: Refinements | null;
+  /** The two text-shading <filter>s (ids <idPrefix>textLight / textDark); '' when refinements are off. */
+  textFilters: string;
+  /** ` filter="url(#…)"` for a text element ('light' on navy/red/value boxes, 'dark' on beige); '' when off. */
+  textAttr(kind: 'light' | 'dark'): string;
   /** One plate (fill, rims, glint, silhouette mask). Pushes its <defs> entries into options.defs. */
   plate(component: Component, width: number, x: number, y: number, options: PlateOptions): string;
   /** <filter> definitions used by efnLogo() and wordmark(); add them to the document's defs. */
@@ -152,6 +213,13 @@ export interface Renderer {
   namePlateWidth(textWidth: number): number;
   /** Name plate + title plate on one row, as separate parts (for animating them). */
   nameStrap(content?: { name?: string; title?: string }, options?: NameStrapOptions): NameStrap;
+  /** Names of the plate styles: the measured looks, usable at any size. */
+  plateStyles: PlateStyleName[];
+  plateStyle(name: PlateStyleName): PlateStyle;
+  /** One plate in a style at any width/height/slant/radius, filling exactly x..x+width, y..y+height. */
+  stylePlate(name: PlateStyleName, options: StylePlateOptions): string;
+  /** One styled plate as a complete SVG document (width x height, or fluid). */
+  plateSvg(name: PlateStyleName, options: Omit<StylePlateOptions, 'defs' | 'x' | 'y'> & { fluid?: boolean }): string;
   /** Logo box + ticker plate on the main row, with the ticker pages, as separate parts (for animating them). */
   logoTicker(content?: { logo?: string; pages?: TickerRow[][] }, options?: { defs: string[] }): LogoTicker;
   /** The full lower third as one SVG document. */
@@ -184,6 +252,11 @@ export const tokens: Tokens;
 export const efnLogoSvg: string;
 export const wordmarks: Record<string, string>;
 export const sampleTickerPayload: { data: Record<string, TickerRow[][]>; [key: string]: unknown };
+
+export { ease, cssEase } from './motion.js';
+export type { EaseName } from './motion.js';
+export { designTokens } from './design-tokens.js';
+export type { Gradient } from './design-tokens.js';
 
 export const fontFiles: Array<{ weight: string; style: string; url: string }>;
 /** Browser: register and load AkkuratStd from the package. */

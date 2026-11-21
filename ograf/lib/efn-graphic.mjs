@@ -33,26 +33,10 @@
 //   isAnimating(T), nextAnimationAt(T)   keep the real-time loop running / wake it up at a later time
 //
 // Written as plain ES2018 (no class fields, ??, ?.), so it runs in older Chromium/CEF builds used by renderers.
-import { createLowerThird, loadFonts, browserMeasureText } from './efn-lower-thirds.mjs';
+import { createLowerThird, loadFonts, browserMeasureText, ease } from './efn-lower-thirds.mjs';
 
-export const EASE = {
-  linear: (p) => p,
-  'sine.in': (p) => 1 - Math.cos((p * Math.PI) / 2),
-  'sine.out': (p) => Math.sin((p * Math.PI) / 2),
-  'sine.inOut': (p) => -(Math.cos(Math.PI * p) - 1) / 2,
-  slow: slowMo(0.7, 0.7),   // GSAP "slow" (SlowMo with its defaults): fast, a long slow middle, fast
-};
-
-// GSAP SlowMo ease (EasePack), non-yoyo: linearRatio of the tween runs at a near-constant slow speed.
-function slowMo(linearRatio, power) {
-  const pow = linearRatio < 1 ? power : 0, p1 = (1 - linearRatio) / 2, p3 = p1 + linearRatio;
-  return (p) => {
-    const r = p + (0.5 - p) * pow;
-    if (p < p1) { const q = 1 - p / p1; return r - q * q * q * q * r; }
-    if (p > p3) { const q = (p - p3) / p1; return r + (p - r) * q * q * q * q; }
-    return r;
-  };
-}
+// Easing curves (GSAP names), shared with the package: see src/motion.js.
+export const EASE = ease;
 
 const STAGE_CSS = `
 :host { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }

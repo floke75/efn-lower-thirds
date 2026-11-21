@@ -1,0 +1,4 @@
+/* AkkuratStd from the efn-lower-thirds package (licensed font: keep within EFN). font-display: block, so graphics never show a fallback font. */
+@font-face { font-family: AkkuratStd; font-weight: 400; font-style: normal; font-display: block; src: url('../assets/fonts/akkuratstd-400.woff') format('woff'); }
+@font-face { font-family: AkkuratStd; font-weight: 400; font-style: italic; font-display: block; src: url('../assets/fonts/akkuratstd-400i.woff') format('woff'); }
+@font-face { font-family: AkkuratStd; font-weight: 700; font-style: normal; font-display: block; src: url('../assets/fonts/akkuratstd-700.woff') format('woff'); }

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EFN plates and tokens</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../tokens/fonts.css">
+<link rel="stylesheet" href="../tokens/efn.css">
+<style>
+  :root { color-scheme: dark; --ui: #1b1c1f; --panel: #2a2c31; --line: #3a3d43; --muted: #9a9ca3; }
+  body { margin: 0; background: var(--ui); color: #e6e6e6; font: 14px/1.45 system-ui, sans-serif; }
+  main { max-width: 1500px; margin: 0 auto; padding: 24px; display: grid; gap: 28px; }
+  h1 { font-size: 18px; margin: 0; } h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; font-weight: 600; }
+  p { margin: 0; color: var(--muted); max-width: 80ch; }
+  code { font: 12px ui-monospace, monospace; color: #cfd1d6; }
+  /* the broadcast stage: 1 css px = 1 px on the 1920x1080 canvas */
+  .stage { background: #333; border: 1px solid var(--line); padding: 20px; display: flex; flex-wrap: wrap; gap: 18px 24px; align-items: flex-start; }
+  .stage.light { background: #8a8f96; }
+  .cell { display: grid; gap: 6px; justify-items: start; }
+  .cell > code { color: var(--muted); }
+  .chain { display: flex; } .chain > efn-plate + efn-plate { margin-left: calc(-1 * var(--efn-shape-overlap)); }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+  .swatch { border: 1px solid var(--line); background: var(--panel); }
+  .swatch > div { height: 44px; }
+  .swatch > code { display: block; padding: 6px 8px; font-size: 11px; }
+  .type { display: grid; gap: 10px; background: #333; padding: 16px 20px; border: 1px solid var(--line); }
+  .type > div { display: flex; align-items: baseline; gap: 16px; }
+  .type code { width: 260px; flex: none; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>EFN plates and tokens</h1>
+    <p>The <code>&lt;efn-plate&gt;</code> element and the design tokens, on a broadcast-scale stage (1 CSS px = 1 px at 1080p). Served by <code>npm run demo</code>.</p>
+  </header>
+
+  <section>
+    <h2>Variants, with text, at the row height (71 px)</h2>
+    <div class="stage" id="variants"></div>
+  </section>
+
+  <section>
+    <h2>Slants (navy and beige-light)</h2>
+    <div class="stage" id="slants"></div>
+  </section>
+
+  <section>
+    <h2>Heights: 37, 50, 71, 110 px (rims keep their px depth)</h2>
+    <div class="stage" id="heights"></div>
+  </section>
+
+  <section>
+    <h2>Chained plates (each starts <code>--efn-shape-overlap</code> before the previous box ends) and glint</h2>
+    <div class="stage">
+      <div class="chain"><efn-plate variant="navy" glint style="font-size:45px">Namn Efternamn</efn-plate><efn-plate variant="beige-light" slant="both" style="height:69px;margin-top:1px;font-size:43.58px;--efn-plate-padding:0.5em">Titel</efn-plate></div>
+      <div class="chain"><efn-plate variant="red" glint style="font-size:40px">BÖRSLUNCH</efn-plate><efn-plate variant="beige" style="font-size:32px;width:700px">OMXS30</efn-plate></div>
+      <div class="chain"><efn-plate variant="line-left" glint style="font-size:23px;width:300px">16:24</efn-plate><efn-plate variant="line-right" glint style="font-size:23px;width:300px;justify-content:flex-end">21 nov 2026</efn-plate></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Refinements: the exact Flowics look (<code>flat</code>) and EFN's refined look (default): text shading, beige vignette</h2>
+    <div class="stage">
+      <div class="cell"><div class="chain"><efn-plate flat variant="navy" style="font-size:45px">Namn Efternamn</efn-plate><efn-plate flat variant="beige-light" slant="both" style="height:69px;margin-top:1px;font-size:43.58px">Titel</efn-plate></div><code>flat</code></div>
+      <div class="cell"><div class="chain"><efn-plate variant="navy" style="font-size:45px">Namn Efternamn</efn-plate><efn-plate variant="beige-light" slant="both" style="height:69px;margin-top:1px;font-size:43.58px">Titel</efn-plate></div><code>refined</code></div>
+      <div class="cell"><efn-plate flat variant="beige" style="font-size:32px;width:420px">OMXS30</efn-plate><code>flat</code></div>
+      <div class="cell"><efn-plate variant="beige" style="font-size:32px;width:420px">OMXS30</efn-plate><code>refined</code></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Colour tokens (<code>tokens/efn.css</code>)</h2>
+    <div class="swatches" id="swatches"></div>
+  </section>
+
+  <section>
+    <h2>Typography tokens</h2>
+    <div class="type" id="type"></div>
+  </section>
+</main>
+<script type="module">
+import '../src/elements/efn-plate.js';
+import { designTokens as t } from '../src/index.js';
+
+const SAMPLE = { navy: 'Namn Efternamn', location: 'Stockholm', red: 'BÖRSLUNCH', gold: 'NOBEL', beige: 'OMXS30 +1,32 %', 'beige-light': 'Titel', 'line-left': '16:24', 'line-right': '21 nov 2026' };
+const plate = (variant, text, attrs = '', style = '') => `<efn-plate variant="${variant}" ${attrs} style="${style}">${text}</efn-plate>`;
+const cell = (label, html) => `<div class="cell">${html}<code>${label}</code></div>`;
+
+document.getElementById('variants').innerHTML = Object.keys(SAMPLE).map((v) => {
+  const line = v.startsWith('line');
+  return cell(v, plate(v, SAMPLE[v], '', line ? 'height:37px;font-size:23px' : ''));
+}).join('');
+document.getElementById('slants').innerHTML = ['right', 'left', 'both', 'none'].map((s) =>
+  cell(`slant="${s}"`, plate('navy', 'Namn', `slant="${s}"`) + plate('beige-light', 'Titel', `slant="${s}"`))).join('');
+document.getElementById('heights').innerHTML = [37, 50, 71, 110].map((h) =>
+  cell(`${h} px`, plate('navy', 'Namn', '', `height:${h}px;font-size:${Math.round(h * 0.6)}px`) + plate('beige', 'Värde', '', `height:${h}px;font-size:${Math.round(h * 0.45)}px`))).join('');
+
+const flat = (o, p = []) => Object.keys(o).flatMap((k) => (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k]) && !o[k].stops ? flat(o[k], p.concat(k)) : [[p.concat(k), o[k]]]));
+const kebab = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+document.getElementById('swatches').innerHTML = flat(t.color).map(([p]) => {
+  const v = `--efn-color-${p.map(kebab).join('-')}`;
+  return `<div class="swatch"><div style="background:var(${v})"></div><code>${v}</code></div>`;
+}).join('');
+document.getElementById('type').innerHTML = Object.keys(t.typography).map((k) => {
+  const ty = t.typography[k], light = ['name', 'location', 'clock', 'tickerValue'].indexOf(k) >= 0;
+  return `<div><code>typography.${k}  ${ty.fontWeight} / ${ty.fontSize}px</code><span style="font-family:var(--efn-font-family);font-weight:${ty.fontWeight};font-size:${ty.fontSize}px;letter-spacing:${ty.letterSpacing || 0}px;color:${light ? 'var(--efn-color-text-light)' : '#e6e6e6'}">Börslunch 1,32 %</span></div>`;
+}).join('');
+window.__platesReady = document.fonts.ready.then(() => new Promise((r) => setTimeout(r, 300)));
+</script>
+</body>
+</html>

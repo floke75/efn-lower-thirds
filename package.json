@@ -1,8 +1,8 @@
 {
   "name": "efn-lower-thirds",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
-  "description": "EFN lower thirds as SVG for OGraf: OGraf v1 graphics, browser/Node renderer, slant and corner geometry, design data and assets.",
+  "description": "EFN broadcast graphics in SVG: OGraf v1 lower thirds, design tokens, plate styles and <efn-plate>, browser/Node renderer, slant and corner geometry, design data and assets.",
   "type": "module",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -19,6 +19,11 @@
       "types": "./lib/roundedSkewedCardPathUniform.d.ts",
       "default": "./lib/roundedSkewedCardPathUniform.js"
     },
+    "./plate-element": {
+      "types": "./src/elements/efn-plate.d.ts",
+      "default": "./src/elements/efn-plate.js"
+    },
+    "./tokens/*": "./tokens/*",
     "./data/*": "./data/*",
     "./assets/*": "./assets/*",
     "./package.json": "./package.json"
@@ -28,13 +33,18 @@
     "lib",
     "data",
     "assets",
+    "tokens",
     "docs",
     "ograf"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/elements/*.js"
+  ],
   "scripts": {
-    "build": "node scripts/build-assets.js && node scripts/build-svgs.js && node scripts/build-ograf.js",
-    "check": "node scripts/build-assets.js --check && node scripts/validate-ograf.js && node scripts/check-compat.js",
+    "build": "node scripts/build-assets.js && node scripts/build-tokens.js && node scripts/build-svgs.js && node scripts/build-ograf.js",
+    "check": "node scripts/build-assets.js --check && node scripts/build-tokens.js --check && node scripts/validate-ograf.js && node scripts/check-compat.js",
+    "test": "node --test test/snapshots.test.js test/behaviour.test.js",
+    "test:update": "node test/snapshots.test.js --update",
     "typecheck": "tsc -p tsconfig.json && node scripts/check-exports.js",
     "demo": "node scripts/serve.js"
   },

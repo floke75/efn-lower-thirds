@@ -19,7 +19,7 @@ const cp = (from, to) => { fs.mkdirSync(path.dirname(to), { recursive: true }); 
 
 fs.rmSync(OUT_PARENT, { recursive: true, force: true });
 fs.cpSync(path.join(ROOT, 'ograf'), OUT, { recursive: true });
-for (const f of ['index.js', 'lower-third.js', 'assets.js']) cp(path.join(ROOT, 'src', f), path.join(VENDOR, 'src', f));
+for (const f of fs.readdirSync(path.join(ROOT, 'src')).filter((f) => f.endsWith('.js'))) cp(path.join(ROOT, 'src', f), path.join(VENDOR, 'src', f));
 cp(path.join(ROOT, 'lib', 'roundedSkewedCardPathUniform.js'), path.join(VENDOR, 'lib', 'roundedSkewedCardPathUniform.js'));
 for (const f of fs.readdirSync(path.join(ROOT, 'assets', 'fonts'))) cp(path.join(ROOT, 'assets', 'fonts', f), path.join(VENDOR, 'assets', 'fonts', f));
 fs.writeFileSync(path.join(OUT, 'lib', 'efn-lower-thirds.mjs'),

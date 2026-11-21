@@ -255,8 +255,8 @@ export default class EfnTicker extends EfnGraphic {
 
 function feedUrl(data) { return data.feed || FEED; }
 function timing(scene) { return { interval: scene.interval, count: scene.pages.length }; }
-// Eased progress of a page-turn tween, exactly 0 before and 1 after it (sine.in(1) is 0.9999999999999999).
-function progress(dt, tw) { const q = (dt - tw.delay) / tw.duration; return q <= 0 ? 0 : q >= 1 ? 1 : EASE['sine.in'](q); }
+// Eased progress of a page-turn tween: exactly 0 before and 1 after it.
+function progress(dt, tw) { return EASE['sine.in']((dt - tw.delay) / tw.duration); }
 
 // Pages as the feed delivers them: [[row, row, row, row], ...], at most 4 rows a page. Also accepts JSON text
 // (from controllers that only edit strings). Rows keep only the fields the ticker shows.

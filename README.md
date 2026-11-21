@@ -2,7 +2,7 @@
 
 EFN's on-air lower thirds, rebuilt as resolution-independent SVG for the [OGraf](https://github.com/ebu/ograf) standard. They replace the current Flowics graphic.
 
-The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordmarks) are replicated to pixel level against the Flowics original. The package renders them in any browser or in Node, sized from their text at runtime. The OGraf graphics are built on top of that: so far the name strap and the logo box + ticker.
+The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordmarks) are replicated to pixel level against the Flowics original. The package renders them in any browser or in Node, sized from their text at runtime. The OGraf graphics are built on top of that: so far the name strap and the logo box + ticker. It is also the base of EFN's broadcast design system: design tokens, the plate looks at any size, and an `<efn-plate>` element for new motion graphics in the same style.
 
 ## OGraf graphics
 
@@ -84,12 +84,77 @@ Also in `ograf-dev/`:
 - `frame.html` renders one frame of a graphic, full viewport (used for thumbnails).
 - `sheet.html` renders an animation contact sheet.
 
+## Design system
+
+For new broadcast graphics and motion elements in the EFN look (not general web design). Everything below is measured from the on-air graphics and generated from the registry, so there is one source for every value.
+
+**Tokens** (`npm run build` regenerates them from `data/`; `npm run check` fails if they are stale):
+
+| File | For |
+|---|---|
+| `designTokens` (from `efn-lower-thirds`) | JavaScript: colours as CSS strings, gradients as `{ stops, x1, y1, x2, y2 }`, px and ms as numbers. Typed. |
+| `tokens/efn.css` | CSS custom properties: `--efn-color-plate-navy`, `--efn-typography-name-size`, `--efn-motion-duration-plate-in`, … |
+| `tokens/fonts.css` | `@font-face` for AkkuratStd (`font-display: block`, so a graphic never shows a fallback font). |
+| `tokens/efn.tokens.json` | The W3C Design Tokens format (DTCG 2025.10), for token tools (Style Dictionary, Figma plugins). |
+
+Groups: `color` (text, plate fills and gradients, ticker values), `font`, `typography` (one style per text slot), `shadow`, `effect` (the refinements below), `shape` (skew 8.45°, radii, the 4.5 px chaining overlap), `size`, `layout` (canvas, safe area, rows), `spacing` (em insets), `motion` (easings, durations, the 75 px shift), `glint`. px are on the 1920×1080 canvas.
+
+**Refinements:** two additions on top of the measured Flowics look, on by default in everything (OGraf graphics, `composite()`, plate styles, `<efn-plate>`):
+- **Text shading:** a soft ambient shadow and a tight contact shadow, light caught by the top-left inner edge of each glyph and a slight shade on its bottom-right inner edge. One version for light text (on navy, red and the value boxes; it replaces the original value shadow) and a warmer, lighter one for dark text on beige. The EFN logo and the programme wordmarks get the light version on top of their own treatment.
+- **Dark text weight:** bold dark text (title, ticker names) is drawn a little lighter, so the shading doesn't make it look heavy: AkkuratStd 400 thickened by a stroke in the text colour (0.03 em), a synthetic semibold between the 400 and 700 the font ships with.
+- **Beige vignette:** towards their edges the title, ticker and text-line plates burn in: the sand colour gets darker with more contrast and more saturation (a gamma curve plus a saturation boost on the plate's own colour, not a grey overlay). It is full only at the very edge and fades out gradually over a wide band, following the plate shape; corners are never stronger than the edges beside them. It sits under the narrow rims and is lit from the upper left like them, so the lower and right edges burn slightly more.
+
+The parameters are in `data/design-tokens.json` → `refinements` (and as tokens under `effect`). `createLowerThird({ refinements: false })` and `<efn-plate flat>` give the exact Flowics replica. The snapshot tests lock both looks. The renderer's `textFilters` and `textAttr('light' | 'dark')` apply the text shading to your own SVG text.
+
+**Motion:** `ease` has the curves Flowics animates with, under their GSAP names (`sine.in`, `sine.out`, `power1.*`, `slow` = GSAP SlowMo), exact at 0 and 1. `cssEase` has the closest CSS `cubic-bezier()` for each (none for `slow`). The per-element timings are in `designTokens.motion`, and the OGraf graphics use the same curves.
+
+**Plate styles:** the measured plate looks (fill, rims, glint), at any width, height, slant and radius:
+
+| Style | From | Text | Default slant |
+|---|---|---|---|
+| `navy` | name plate | light | right |
+| `location` | location bar | light | right |
+| `red` | logo box | light | right |
+| `gold` | Nobel logo box (with glitter) | light | right |
+| `beige` | ticker / text line | dark | left |
+| `beige-light` | title plate | dark | both |
+| `line-left`, `line-right` | logo line halves (37 px) | light | right / left |
+
+```js
+const lt = createLowerThird({ idPrefix: 'gfx-' });
+const defs = [];
+const body = lt.stylePlate('navy', { width: 420, height: 71, x: 100, y: 900, slant: 'right', glint: true, defs });
+const svg = lt.plateSvg('beige', { width: 300, height: 50 });      // one plate as a complete SVG document
+```
+
+The plate fills exactly `x..x+width` × `y..y+height`. Rims keep their measured px depth at every size, and the glint's travel scales with the width. Corner radii default to the measured ones; set `radius` for very small or very large plates. Heights other than the measured ones (71 and 37 px) look right but weren't compared with an original, since none exists.
+
+**`<efn-plate>`:** a plate behind HTML content, which hugs its text and redraws when its size changes:
+
+```html
+<link rel="stylesheet" href="node_modules/efn-lower-thirds/tokens/fonts.css">
+<script type="module">import 'efn-lower-thirds/plate-element';</script>
+
+<efn-plate variant="navy" glint>Namn Efternamn</efn-plate>
+<efn-plate variant="beige-light" style="height: 69px">Titel</efn-plate>
+```
+
+- **Attributes:** `variant` (a style above), `slant` (`right`, `left`, `both`, `none`), `radius`, `glint`, `flat` (no refinements).
+- **Text shading:** the refinements' SVG filter, applied with CSS `filter`. It is defined inside the element and once in the document, so engines that resolve `url(#…)` in either scope find it.
+- **Size it with CSS.** The default height is the 71 px row; the width follows the content. Font and text colour default to the variant's; override them with ordinary CSS.
+- **Text inset:** `--efn-plate-padding` (default `0.5em`) on straight sides; slanted sides add the slant's run.
+- **Glint:** `restartGlint()` restarts its 15 s loop, e.g. at a take-in.
+- **Chaining:** to chain plates as the lower third does, give each following plate `margin-left: calc(-1 * var(--efn-shape-overlap))`.
+- **Where it runs:** Chromium/CEF 69 and later. Importing it without a DOM (Node) is safe.
+
+`npm run demo` → http://127.0.0.1:8765/demo/plates.html shows every style, slant and height, and the colour and type tokens.
+
 ## Use it in an app
 
 The repository is an installable package: plain ES modules, no runtime dependencies, no build step, with TypeScript declarations (checked by `npm run typecheck`).
 
 ```bash
-npm install github:floke75/efn-lower-thirds#v0.4.0
+npm install github:floke75/efn-lower-thirds#v0.5.0
 ```
 
 The repository is private, so the machine running the install needs GitHub access to it (for example, signed in with `gh auth login`). Pin a tag, and bump it to take an update.
@@ -122,7 +187,8 @@ el.innerHTML = lt.composite(
   - `namePlateWidth()` / `titleWidth()`: the sizing rules
   - `efnLogo()`, `wordmark()`, `logoFilters`
   - geometry helpers: `geom()`, `shapePath()`, `cornerGeom()`, `slantOffset()`
-  - the built-in `registry`, `tokens`, `wordmarks`, `efnLogoSvg`
+  - the built-in `registry`, `tokens` (the measurement record the renderer uses), `wordmarks`, `efnLogoSvg`
+  - the design system: `designTokens`, `ease`, `cssEase`, and on the renderer `plateStyles`, `plateStyle()`, `stylePlate()`, `plateSvg()` (see Design system)
 - **Bundlers:** fonts are resolved with `new URL(..., import.meta.url)`, which works with native ES modules, Vite and webpack 5. You can also serve `efn-lower-thirds/assets/fonts/*` yourself and use your own `@font-face`.
 
 **Entry points:**
@@ -132,6 +198,8 @@ el.innerHTML = lt.composite(
 | `efn-lower-thirds` | Everything above. Includes the built-in data (about 135 KB). |
 | `efn-lower-thirds/renderer` | `createRenderer({ registry, tokens, efnLogoSvg, wordmarks })` only, for bringing your own (e.g. edited) data. |
 | `efn-lower-thirds/geometry` | Just the slant and corner-rounding functions. |
+| `efn-lower-thirds/plate-element` | Defines `<efn-plate>` (the only entry point with a side effect). |
+| `efn-lower-thirds/tokens/*` | `efn.css`, `fonts.css`, `efn.tokens.json`. |
 | `efn-lower-thirds/data/*`, `efn-lower-thirds/assets/*` | The raw JSON, fonts, logo and wordmark files. |
 
 The name plate's growth rule (`namePlateWidth`) is provisional; see the design spec.
@@ -153,8 +221,11 @@ Instead of npm you can add the repository as a git submodule and import `src/ind
 | `data/design-tokens.json` | Shared values: shape, fills, rim model, typography, animation timings, states, data feed, rendering. |
 | `data/samples/ticker-payload.json` | Sample of the ticker data feed. |
 | `docs/design-spec.md` | The design rules in prose: layout, shape, rims, fills, glint, ticker, logos, text, animation, data, rendering. **Read this first.** |
-| `demo/` | Browser demo of the package (`npm run demo`). |
-| `scripts/` | `build-assets.js` (generates `src/assets.js`), `build-svgs.js` (static SVGs into `dist/`), `build-ograf.js` (OGraf package + zip), `validate-ograf.js` (manifests vs the official schemas), `check-compat.js` (ES2018 / Chromium 69 guard), `serve.js` (dev server). |
+| `demo/` | Browser demos (`npm run demo`): `index.html`, the full lower third, editable; `plates.html`, the style guide (plate styles, `<efn-plate>`, tokens). |
+| `tokens/` | **Generated** design tokens: `efn.css`, `fonts.css`, `efn.tokens.json` (DTCG). See Design system. |
+| `src/design-tokens.js`, `src/motion.js`, `src/elements/efn-plate.js` | `designTokens` (generated), the easing curves, and the `<efn-plate>` element. |
+| `test/` | `npm test`: snapshot fingerprints of every SVG the package produces (`snapshots.json`), and behaviour tests (easings, plate styles, tokens, ticker page timing). `types.ts` is the type test. |
+| `scripts/` | `build-assets.js` (generates `src/assets.js`), `build-tokens.js` (generates the design tokens), `build-svgs.js` (static SVGs into `dist/`), `build-ograf.js` (OGraf package + zip), `validate-ograf.js` (manifests vs the official schemas), `check-compat.js` (ES2018 / Chromium 69 guard), `serve.js` (dev server). |
 | `reference/flowics/` | The Flowics original as data, for the animation and state work: `layout-spec.json` (every overlay and element in 1920×1080 px, with styles, bindings, in/out and update animations), `layout-outline.txt` (readable outline), `animation-presets.json` (the 37 GSAP presets). |
 | `assets/fonts/` | AkkuratStd 400 / 400i / 700 (woff). Licensed font. |
 | `assets/logos/EFN_logo.svg` | EFN logo. |
@@ -168,7 +239,7 @@ Needs Node 18 or later for the scripts. Run `npm install` once for the TypeScrip
 npm run build
 ```
 
-This regenerates `src/assets.js` and writes to `dist/` (not committed): static SVGs, and the OGraf package (folder + zip). In detail:
+This regenerates `src/assets.js` and the design tokens (`src/design-tokens.js`, `tokens/`), and writes to `dist/` (not committed): static SVGs, and the OGraf package (folder + zip). In detail:
 - `dist/elements/<component>[--variant].svg`: each plate at its Flowics size, without text.
 - `dist/preview/on-air-capture.svg`: the full lower third with sample content.
 
@@ -178,7 +249,13 @@ Run it after editing anything in `data/` or `assets/`. Before committing:
 npm run check
 ```
 
-It fails if `src/assets.js` is out of date, if a manifest doesn't validate against the official OGraf schemas, or if the runtime code uses syntax or APIs newer than ES2018 / Chromium 69.
+It fails if `src/assets.js` or the design tokens are out of date, if a manifest doesn't validate against the official OGraf schemas, or if the runtime code uses syntax or APIs newer than ES2018 / Chromium 69.
+
+```bash
+npm test
+```
+
+It renders every SVG the package can produce (the full lower third, each plate, name strap, logo box + ticker for every logo, every plate style, slant and size, and the exact Flowics look without refinements) with fixed inputs and compares them with the fingerprints in `test/snapshots.json`. Any change to the output fails: a change made for one graphic can't quietly alter another. When a change is intended, check it visually (`demo/plates.html`, `npm run build` previews), then accept it with `npm run test:update` and commit the updated `test/snapshots.json`. A failing case writes its new output to `test/output/` for inspection. It also tests the easing curves, the plate-style API, the token values and the ticker's page timing.
 
 After changing the API or the declarations:
 
@@ -205,7 +282,7 @@ node scripts/build-svgs.js --data my-content.json --name my-preview
 Render SVGs at **3840×2160 and downscale to 1080p**: the rims are half-pixel layers at 1080p, so this matches the original best.
 
 **Releasing:**
-1. Bump `version` in `package.json`.
+1. Bump `version` in `package.json` (and the graphics' manifests), then run `npm run build`, `npm run check` and `npm test`.
 2. Commit.
 3. Tag `vX.Y.Z` and push with `--tags`.
 4. Apps update by changing the tag in their install line.
@@ -237,6 +314,7 @@ const d = roundedSkewedCardPathUniform({
 - **Try the package in the target renderer(s)** and adjust `renderRequirements` if they need it.
 - **Text fitting:** decide the final name-plate rule (grow with the text, as in the demo, or shrink the text as Flowics does). See the design spec.
 - **Missing wordmarks:** BÖRSFRUKOST, MARKNAD and UPDATE haven't been supplied, so those logo boxes are plate-only.
+- **Design system, still to do:** motion helpers for the Flowics presets (slide from under an edge, wipe, slide-and-fade) on top of `ease`; a guide to writing a new OGraf graphic on the base class (today it is a comment in `ograf/lib/efn-graphic.mjs`); pixel (screenshot) tests next to the SVG snapshots; a changelog.
 
 ## Provenance
 

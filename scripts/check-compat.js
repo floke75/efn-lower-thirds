@@ -6,7 +6,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const FILES = ['src/index.js', 'src/lower-third.js', 'lib/roundedSkewedCardPathUniform.js',
+const jsIn = (dir) => fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true })
+  .flatMap((e) => (e.isDirectory() ? jsIn(`${dir}/${e.name}`) : /\.m?js$/.test(e.name) ? [`${dir}/${e.name}`] : []));
+const FILES = [...jsIn('src'), 'lib/roundedSkewedCardPathUniform.js',
   ...fs.readdirSync(path.join(ROOT, 'ograf')).filter(f => f.endsWith('.mjs')).map(f => `ograf/${f}`),
   ...fs.readdirSync(path.join(ROOT, 'ograf', 'lib')).filter(f => f.endsWith('.mjs')).map(f => `ograf/lib/${f}`)];
 const RULES = [

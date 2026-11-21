@@ -11,6 +11,8 @@
 //     wordmarks   { <logo-box variant id>: text of its assets/wordmarks/*.svg }
 //     idPrefix    prefix for every SVG id this renderer emits. Use a distinct one per renderer when several SVGs
 //                 are inlined in the same HTML document (ids are document-global there).
+//     refinements EFN's additions to the measured look (tokens.refinements): text shading and the beige plates'
+//                 vignette. Default true; false draws the exact Flowics replica.
 //
 //   r.plate(component, width, x, y, { defs })   one plate: fill + rims + glint, masked by its silhouette
 //   r.composite(content, { measureText })       the full lower third as one fluid SVG document
@@ -98,17 +100,62 @@ export function cornerGeom(shape, g) {
   });
 }
 
+// Vignette profile as an feFuncA lookup table. Input: the shape's alpha blurred along one axis with sigma, which at
+// distance d inside a straight edge is 1 - Phi(-d / sigma) (<= 0.5 at or outside the edge). Output: profile(d),
+// with d = 0 at and outside the edge.
+const erf = (x) => {   // Abramowitz & Stegun 7.1.26 (|error| < 1.5e-7)
+  const s = x < 0 ? -1 : 1, a = Math.abs(x), t = 1 / (1 + 0.3275911 * a);
+  return s * (1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-a * a));
+};
+const normCdf = (z) => 0.5 * (1 + erf(z / Math.SQRT2));
+function vignetteTable(sigma, profile, n = 128) {
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const r = 1 - k / (n - 1);
+    let d;
+    if (r <= 0) d = Infinity;
+    else if (r >= 0.5) d = 0;
+    else { let lo = 0, hi = 12; for (let i = 0; i < 40; i++) { const mid = (lo + hi) / 2; if (normCdf(-mid) > r) lo = mid; else hi = mid; } d = sigma * (lo + hi) / 2; }
+    out.push(+Math.max(0, profile(d)).toFixed(4));
+  }
+  return out.join(' ');
+}
+
 // Rims extend BLEED px beyond the true edge so edge pixels are fully the rim colour; the anti-aliased silhouette
 // mask then cuts the plate once (stacking anti-aliased masks per edge leaks rim colours into the other edges).
 const BLEED = 2;
 
 // ---------- renderer ----------
-export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, wordmarks = {}, idPrefix = '' }) {
+export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, wordmarks = {}, idPrefix = '', refinements = true }) {
   const comp = (id) => REG.components.find(c => c.id === id);
   const id = (name) => `${idPrefix}${name}`;
   let uid = 0;
   const nid = (p) => `${idPrefix}${p}${++uid}`;
   const resetIds = () => { uid = 0; };
+  const RF = refinements === false ? null : (TOK.refinements || null);
+
+  // ---------- refinements: text shading ----------
+  // Two SVG filters (light text, dark text): a soft ambient and a tight contact shadow, the light caught by each
+  // glyph's top-left inner edge (rim) and a slight darkening of its bottom-right inner edge (shade). Parameters:
+  // tokens.refinements.textLight / textDark. textFilters must be in the defs of any document that uses textAttr().
+  function textFilter(name, p) {
+    const drop = (k) => { const q = p[k]; return `<feGaussianBlur in="SourceAlpha" stdDeviation="${q.blur}"/><feOffset dx="${q.dx}" dy="${q.dy}" result="${k}A"/><feFlood flood-color="${q.color}" flood-opacity="${q.opacity}"/><feComposite in2="${k}A" operator="in" result="${k}"/>`; };
+    const band = (k) => { const q = p[k]; return `<feOffset in="SourceAlpha" dx="${q.dx}" dy="${q.dy}" result="${k}S"/><feComposite in="SourceAlpha" in2="${k}S" operator="out"/><feGaussianBlur stdDeviation="${q.blur}"/><feComposite in2="SourceAlpha" operator="in" result="${k}A"/><feFlood flood-color="${q.color}" flood-opacity="${q.opacity}"/><feComposite in2="${k}A" operator="in" result="${k}"/>`; };
+    return `<filter id="${id(name)}" x="-15%" y="-35%" width="130%" height="185%" color-interpolation-filters="sRGB">${drop('ambient')}${drop('contact')}${band('rim')}${band('shade')}` +
+      '<feMerge><feMergeNode in="ambient"/><feMergeNode in="contact"/><feMergeNode in="SourceGraphic"/><feMergeNode in="shade"/><feMergeNode in="rim"/></feMerge></filter>';
+  }
+  const textFilters = RF ? textFilter('textLight', RF.textLight) + textFilter('textDark', RF.textDark) : '';
+  // filter attribute for a text element: kind 'light' (on navy, red, value boxes) or 'dark' (on beige)
+  const textAttr = (kind) => (RF ? ` filter="url(#${id(kind === 'dark' ? 'textDark' : 'textLight')})"` : '');
+  const useTextFilters = (defs) => { if (RF && defs && defs.indexOf(textFilters) < 0) defs.push(textFilters); };
+  // Weight of bold dark text (title, ticker names). Flowics: 700. Refinement: a lighter weight thickened by a stroke
+  // in the text colour (tokens.refinements.darkText: weight, strokeEm), so the shading doesn't make it look heavy.
+  const darkWeight = (sizePx, color) => {
+    const dt = RF && RF.darkText;
+    if (!dt) return ' font-weight="700"';
+    const sw = +(sizePx * dt.strokeEm).toFixed(3);
+    return ` font-weight="${dt.weight}"` + (sw > 0 ? ` stroke="${color}" stroke-width="${sw}" stroke-linejoin="round"` : '');
+  };
 
   // ---------- paint ----------
   const stops = (arr) => arr.map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('');
@@ -229,6 +276,7 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
     const sil = nid('sil');
     defs.push(`<mask id="${sil}" maskUnits="userSpaceOnUse" ${box}><path d="${d}" fill="#fff"/></mask>`);
     let g = `<path d="${d}" fill="${paint}"/>`;
+    const vg = RF && RF.vignette && RF.vignette.components.indexOf(c.id) >= 0 ? RF.vignette : null;
     if (fill && fill.texture && fill.texture.type === 'glitter') {
       // Gold glitter: two grey fractal-noise layers (fine grain + coarse mottling) added to the fill, clipped to
       // the shape. Frequencies/amplitudes calibrated to the Nobel video's texture statistics.
@@ -241,6 +289,38 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
         `<feComposite in="SourceGraphic" in2="noise" operator="arithmetic" k1="0" k2="1" k3="1" k4="-0.5" result="sum"/>` +
         `<feComposite in="sum" in2="SourceAlpha" operator="in"/></filter>`);
       g = `<path d="${d}" fill="${paint}" filter="url(#${fid})"/>`;
+    }
+    if (vg) {
+      // Refinement: the plate's own colour burnt in towards the edges: a contrast curve (gamma) that darkens it and a
+      // saturation boost, so the sand gets deeper and richer rather than greyer.
+      // Edge mask, at distance d from the nearest edge, in two parts that add up to `opacity` at the edge:
+      //   ramp: (1 - edgeShare) x (1 - d / width)^curve   a long, gentle build-up over `width` px
+      //   edge: edgeShare x exp(-d / edgeWidth)           the last few px, where it rises to full strength
+      // so the burn stays gradual until close to the edge. The distance comes from the shape's alpha blurred along
+      // one axis at a time (horizontal for the left/right and slanted edges, vertical for top/bottom), read through
+      // lookup tables that turn the blurred value back into distance and apply the profile. The axes are combined
+      // with max(), so a corner is never stronger than the edges beside it (a 2D blur burns corners in more); a
+      // light blur rounds the ramp's mitre where the axes meet. dx/dy shift the axes towards the light.
+      // It sits under the narrow rims.
+      const vid = nid('vig'), W0 = vg.width, sig = W0 / 2.4, m = W0 + Math.abs(vg.dx) + Math.abs(vg.dy) + 2;
+      const share = def(vg.edgeShare, 0), ew = def(vg.edgeWidth, 2), curve = def(vg.curve, 1);
+      const rampT = vignetteTable(sig, (dd) => (1 - share) * Math.pow(Math.max(0, 1 - dd / W0), curve));
+      const edgeT = vignetteTable(sig, (dd) => (share > 0 ? share * Math.exp(-dd / ew) : 0));
+      const toGrey = '<feColorMatrix values="0 0 0 1 0  0 0 0 1 0  0 0 0 1 0  0 0 0 0 1"/>';
+      // Each axis: blurred alpha (outside the plate it reads as "at the edge", so the smoothing blur doesn't weaken
+      // the edge) -> each table -> grey.
+      const axis = (k, sd, dx, dy) => `<feGaussianBlur in="SourceAlpha" stdDeviation="${sd}" result="${k}b"/><feOffset in="${k}b" dx="${dx}" dy="${dy}" result="${k}o"/>` +
+        `<feComponentTransfer in="${k}o"><feFuncA type="table" tableValues="${rampT}"/></feComponentTransfer>${toGrey.replace('/>', ` result="${k}r"/>`)}` +
+        `<feComponentTransfer in="${k}o"><feFuncA type="table" tableValues="${edgeT}"/></feComponentTransfer>${toGrey.replace('/>', ` result="${k}e"/>`)}`;
+      defs.push(`<filter id="${vid}" filterUnits="userSpaceOnUse" x="${f2(gm.X - m)}" y="${f2(gm.Y - m)}" width="${f2(gm.W + 2 * m)}" height="${f2(gm.H + 2 * m)}" color-interpolation-filters="sRGB">` +
+        axis('mx', `${f2(sig)} 0`, vg.dx, 0) + axis('my', `0 ${f2(sig)}`, 0, vg.dy) +
+        `<feBlend in="mxr" in2="myr" mode="lighten"/><feGaussianBlur stdDeviation="${f2(def(vg.cornerSoftness, 3))}" result="ramp"/>` +
+        '<feBlend in="mxe" in2="mye" mode="lighten" result="edgeband"/>' +
+        '<feComposite in="ramp" in2="edgeband" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>' +
+        `<feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${vg.opacity} 0 0 0 0"/><feComposite in2="SourceAlpha" operator="in" result="edge"/>` +
+        `<feComponentTransfer in="SourceGraphic">${['R', 'G', 'B'].map((ch) => `<feFunc${ch} type="gamma" amplitude="1" exponent="${vg.burn}" offset="0"/>`).join('')}</feComponentTransfer>` +
+        `<feColorMatrix type="saturate" values="${vg.saturate}"/><feComposite in2="edge" operator="in"/></filter>`);
+      g += `<path data-refinement="vignette" d="${d}" fill="${paint}" filter="url(#${vid})"/>`;
     }
     if (bevel && bevel.corners) g += rimRings(shape, gm, bevel, defs);
     else for (const edge of ['top', 'left', 'right', 'bottom']) {   // fallback: per-edge bands (no corner data)
@@ -291,8 +371,10 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
     if (!EFN_PATH) throw new Error('createRenderer: efnLogoSvg was not provided');
     const sc = Math.min(w / EFN_BBOX.w, h / EFN_BBOX.h);
     const ox = x + (w - EFN_BBOX.w * sc) / 2 - EFN_BBOX.x * sc, oy = y + (h - EFN_BBOX.h * sc) / 2 - EFN_BBOX.y * sc;
-    return `<g data-component="logo-line-logo" filter="url(#${id('logoBevel')})"><path d="${EFN_PATH}" fill="${fill}" transform="translate(${f2(ox)},${f2(oy)}) scale(${+sc.toFixed(5)})"/></g>`;
+    return shadeLogo(`<g data-component="logo-line-logo" filter="url(#${id('logoBevel')})"><path d="${EFN_PATH}" fill="${fill}" transform="translate(${f2(ox)},${f2(oy)}) scale(${+sc.toFixed(5)})"/></g>`);
   }
+  // Refinement: logos get the light-text shading on top of their measured treatment (needs textFilters in defs).
+  const shadeLogo = (markup) => (RF && markup ? `<g data-refinement="logo-shading"${textAttr('light')}>${markup}</g>` : markup);
   // Client wordmark of a logo-box variant, placed in the box at (bx, by) with its fitted transform, on-air fill
   // and inset treatment. "" when no wordmark was supplied for the variant. Needs logoFilters in the defs.
   function wordmark(v, bx, by) {
@@ -303,7 +385,7 @@ export function createRenderer({ registry: REG, tokens: TOK, efnLogoSvg = null, 
     const d = allMatches(txt, /<path\b[^>]*?\bd="([^"]+)"/g).map(m => m[1]).join(' ');
     if (!d) throw new Error('no path data in ' + cw.file);
     const p = cw.placement;
-    return `<g data-slot="wordmark" data-wordmark="${v.id}" filter="url(#${id('wordmarkInset')})"><path d="${d}" fill="${comp('logo-box').wordmark.fill}" transform="translate(${f2(bx + p.tx)},${f2(by + p.ty)}) scale(${p.scale})"/></g>`;
+    return shadeLogo(`<g data-slot="wordmark" data-wordmark="${v.id}" filter="url(#${id('wordmarkInset')})"><path d="${d}" fill="${comp('logo-box').wordmark.fill}" transform="translate(${f2(bx + p.tx)},${f2(by + p.ty)}) scale(${p.scale})"/></g>`);
   }
 
   // ---------- documents ----------
@@ -342,7 +424,7 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
     const padN = (t.linePaddingEm.left + t.linePaddingEm.right) * nfs0 + slantOffset(np.shape);
     const padT = (tt.linePaddingEm.left + tt.linePaddingEm.right) * tfs0;
     const nameAdv = measureText ? measureText(name, { weight: t.weight, sizePx: nfs0 }) : null;
-    const titleAdv = !title ? 0 : measureText ? measureText(title, { weight: tt.weight, sizePx: tfs0 }) : estimateWidth(title, tfs0);
+    const titleAdv = !title ? 0 : measureText ? measureText(title, { weight: RF && RF.darkText ? RF.darkText.weight : tt.weight, sizePx: tfs0 }) : estimateWidth(title, tfs0);
     let nameW = measureText ? namePlateWidth(nameAdv) : np.flowicsSize.w, nfs = nfs0, tfs = tfs0, tw = title ? padT + titleAdv : 0;
     if (measureText) {
       const avail = right - x0 + (title ? overlap : 0);
@@ -352,13 +434,14 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
       if (title && tw > titleRoom) { const s = titleRoom / (padT + titleAdv); tfs = tfs0 * s; tw = titleRoom; }
     }
     const out = { namePlate: plate(np, nameW, x0, y, { defs }), titlePlate: '', titleText: '' };
-    out.nameText = `<text data-slot="name" x="${f2(x0 + t.linePaddingEm.left * nfs0)}" y="${f2(y + t.box.y + t.box.h / 2)}" dominant-baseline="central" font-weight="700" font-size="${f2(nfs)}" fill="${t.color}">${esc(name)}</text>`;
+    useTextFilters(defs);
+    out.nameText = `<text data-slot="name" x="${f2(x0 + t.linePaddingEm.left * nfs0)}" y="${f2(y + t.box.y + t.box.h / 2)}" dominant-baseline="central" font-weight="700" font-size="${f2(nfs)}" fill="${t.color}"${textAttr('light')}>${esc(name)}</text>`;
     const layout = { y, name: { x: x0, w: nameW, textBoxW: nameW - 13.5, fontPx: f2(nfs) }, title: null };
     if (title) {
       const tx = x0 + nameW - overlap;   // = 595.0 in Flowics: the title starts 4.5 px before the name box ends
       const ty = y + tp.layout.yOffsetInRow;
       out.titlePlate = plate(tp, tw, tx, ty, { defs });
-      out.titleText = `<text data-slot="title" x="${f2(tx + tt.linePaddingEm.left * tfs)}" y="${f2(ty + tp.shape.insetTop + tp.shape.height / 2)}" dominant-baseline="central" font-weight="700" font-size="${f2(tfs)}" fill="${tt.color}">${esc(title)}</text>`;
+      out.titleText = `<text data-slot="title" x="${f2(tx + tt.linePaddingEm.left * tfs)}" y="${f2(ty + tp.shape.insetTop + tp.shape.height / 2)}" dominant-baseline="central"${darkWeight(tfs, tt.color)} font-size="${f2(tfs)}" fill="${tt.color}"${textAttr('dark')}>${esc(title)}</text>`;
       layout.title = { x: tx, y: ty, w: tw, elementW: right - tx, fontPx: f2(tfs) };
     }
     out.layout = layout;
@@ -384,6 +467,7 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
     out.logoPlate = plate(lb, lw, lx, y, Object.assign({ defs }, v.fill ? { fill: v.fill } : {}, v.bevel ? { bevel: v.bevel } : {}));
     out.wordmark = wordmark(v, lx, y);
     if (out.wordmark && defs.indexOf(logoFilters) < 0) defs.push(logoFilters);   // the wordmark's inset filter
+    if (out.wordmark) useTextFilters(defs);                                         // and its shading (refinements)
     const tk = comp('ticker-plate');
     const tx = lx + lw - REG.adjacentPlateOverlapPx;   // = 341.5 in Flowics (BÖRSLUNCH)
     const tw = rows.safeRight - tx;
@@ -396,6 +480,7 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
     // Flowics masks the whole list with the ticker's hard mask: nothing in the columns paints outside the plate.
     out.tickerClip = nid('tclip');
     defs.push(`<clipPath id="${out.tickerClip}"><path d="${shapePath(tk.shape, tw, tx, y)}"/></clipPath>`);
+    if (pages.length) useTextFilters(defs);
     const columns = pages.length ? [0, 1, 2, 3].map((i) => {
       const cx = listX + i * colW;
       // ramp: 235 wide, right-anchored in a rect that starts 2px below the list top; gradient 46.4%..89.5% of the column
@@ -417,13 +502,55 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
       let s = c.ramp;
       if (!row) return s;
       if (row['Color value']) s += `<path data-component="ticker-value-box" d="${c.boxPath}" fill="${escAttr(row['Color value'])}" mask="url(#${c.mask})"/>`;
-      s += `<text data-slot="short" x="${f2(c.cx + ts.short.linePaddingEm.left * 32)}" y="${f2(listY + ts.short.linePaddingEm.top * 32 + 32)}" font-weight="700" font-size="32" fill="${ts.short.color}">${esc(def(row['Kort namn'], ''))}</text>`;
-      s += `<text data-slot="value" x="${f2(c.cx + colW - ts.value.linePaddingEm.right * 32)}" y="${f2(listY + ts.value.linePaddingEm.top * 32 + 32)}" text-anchor="end" font-weight="700" font-size="32" fill="#fff" filter="url(#${id('vshadow')})">${esc(def(row['Procent string'], ''))}</text>`;
-      if (row['Eget namn']) s += `<text data-slot="long" x="${f2(c.cx + ts.long.linePaddingEm.left * 18)}" y="${f2(listY + listH - 9)}" font-weight="400" font-size="18" fill="${ts.long.color}">${esc(row['Eget namn'])}</text>`;
+      s += `<text data-slot="short" x="${f2(c.cx + ts.short.linePaddingEm.left * 32)}" y="${f2(listY + ts.short.linePaddingEm.top * 32 + 32)}"${darkWeight(32, ts.short.color)} font-size="32" fill="${ts.short.color}"${textAttr('dark')}>${esc(def(row['Kort namn'], ''))}</text>`;
+      // value: the Flowics drop shadow, or with refinements the light-text shading (which includes its shadow)
+      s += `<text data-slot="value" x="${f2(c.cx + colW - ts.value.linePaddingEm.right * 32)}" y="${f2(listY + ts.value.linePaddingEm.top * 32 + 32)}" text-anchor="end" font-weight="700" font-size="32" fill="#fff"${RF ? textAttr('light') : ` filter="url(#${id('vshadow')})"`}>${esc(def(row['Procent string'], ''))}</text>`;
+      if (row['Eget namn']) s += `<text data-slot="long" x="${f2(c.cx + ts.long.linePaddingEm.left * 18)}" y="${f2(listY + listH - 9)}" font-weight="400" font-size="18" fill="${ts.long.color}"${textAttr('dark')}>${esc(row['Eget namn'])}</text>`;
       return s;
     }).join(''));
     out.layout = { y, logo: { x: lx, w: lw, variant: v.id }, ticker: { x: tx, w: tw }, list: { x: listX, y: listY, w: listW, h: listH, colW } };
     return out;
+  }
+
+  // ---------- plate styles: the measured looks at any size ----------
+  // Each style is the fill, rims and glint of a measured plate. stylePlate() draws one on a shape of any width,
+  // height, slant and radius, filling exactly x..x+width, y..y+height (the Flowics box corrections are dropped).
+  // Rims keep their measured px depths at every size; the glint travel scales with the width.
+  const STYLES = {
+    navy: ['name-plate'], location: ['location-plate'], red: ['logo-box'], gold: ['logo-box', 'nobel'],
+    beige: ['ticker-plate'], 'beige-light': ['title-plate'], 'line-left': ['logo-line-left'], 'line-right': ['logo-line-right'],
+  };
+  // slant: which sides are slanted -> the geometry's `position` (named after the straight side's placement)
+  const SLANTS = { right: 'left', left: 'right', both: 'middle', none: 'none' };
+  const POSITION_SLANT = { left: 'right', right: 'left', middle: 'both', none: 'none' };
+  const plateStyles = Object.keys(STYLES);
+  function plateStyle(name) {
+    const s = STYLES[name];
+    if (!s) throw new Error(`unknown plate style "${name}" (one of ${plateStyles.join(', ')})`);
+    const c = comp(s[0]), v = s[1] ? c.variants.find((x) => x.id === s[1]) : null;
+    const textColor = (c.text && c.text.color) || TOK.typography[name === 'beige' ? 'tickerShort' : 'location'].color;
+    return { component: c, fill: (v && v.fill) || c.fill, bevel: (v && v.bevel) || c.bevel, glint: c.glint && c.glint.sigmaPx ? c.glint : null,
+      slant: POSITION_SLANT[c.shape.position], radius: c.shape.radius, height: c.shape.height, textColor };
+  }
+  // options: width (required), height (default: the style's measured plate height), x, y, slant ('right' | 'left'
+  // | 'both' | 'none', default: the style's own), radius, glint (true: the style's glint, if it has one), defs.
+  function stylePlate(name, { width, height, x = 0, y = 0, slant, radius, glint = false, defs } = {}) {
+    const st = plateStyle(name), c = st.component;
+    if (!(width > 0)) throw new Error('stylePlate: width must be a positive number');
+    if (!defs) throw new Error('stylePlate: options.defs (an array) is required');
+    const position = SLANTS[def(slant, st.slant)];
+    if (!position) throw new Error(`unknown slant "${slant}" (right, left, both or none)`);
+    const h = def(height, st.height);
+    const shape = Object.assign({}, c.shape, { position, radius: def(radius, st.radius), insetTop: 0, height: h, slantOutsetPx: {}, straightInsetPx: {} });
+    const g = glint && st.glint ? Object.assign({}, st.glint, { centreFromPx: st.glint.centreRelative[0] * width, centreToPx: st.glint.centreRelative[1] * width }) : null;
+    return plate(c, width, x, y, { defs, shape, fill: st.fill, bevel: st.bevel, glint: g });
+  }
+  // One styled plate as a complete SVG document of width x height (fluid: fills its container instead).
+  function plateSvg(name, options = {}) {
+    resetIds();
+    const defs = [], h = def(options.height, plateStyle(name).height);
+    const body = stylePlate(name, Object.assign({}, options, { x: 0, y: 0, height: h, defs }));
+    return svgDocument(options.width, h, defs, body, { fluid: !!options.fluid });
   }
 
   // ---------- full lower third ----------
@@ -452,8 +579,9 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
       body += plate(L, L.layout.w, L.layout.x, y, { defs });
       body += plate(R, R.layout.w, R.layout.x, y, { defs });
       const lg = comp('logo-line-logo').layout; body += efnLogo(lg.x + 2, lg.y + 1, lg.w - 4, lg.h - 2);
-      body += `<text data-slot="clock" x="${f2(L.layout.x + L.text.offsetX)}" y="${f2(y + 18.5)}" dominant-baseline="central" font-weight="700" font-size="23" fill="${L.text.color}">${esc(def(content.clock, ''))}</text>`;
-      body += `<text data-slot="date" x="${f2(R.layout.x + R.layout.w - R.text.insetRight)}" y="${f2(y + 18.5)}" text-anchor="end" dominant-baseline="central" font-weight="700" font-size="23" fill="${R.text.color}">${esc(def(content.date, ''))}</text>`; }
+      body += `<text data-slot="clock" x="${f2(L.layout.x + L.text.offsetX)}" y="${f2(y + 18.5)}" dominant-baseline="central" font-weight="700" font-size="23" fill="${L.text.color}"${textAttr('light')}>${esc(def(content.clock, ''))}</text>`;
+      body += `<text data-slot="date" x="${f2(R.layout.x + R.layout.w - R.text.insetRight)}" y="${f2(y + 18.5)}" text-anchor="end" dominant-baseline="central" font-weight="700" font-size="23" fill="${R.text.color}"${textAttr('light')}>${esc(def(content.date, ''))}</text>`;
+      useTextFilters(defs); }
     return svgDocument(1920, 1080, defs, body, { fontsUrl, fluid });
   }
 
@@ -475,7 +603,7 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
       resetIds(); const defs = [];
       const shape = opts.shape || c.shape;
       let body = plate(c, w, 0, 0, { ...opts, defs });
-      if (opts.wordmark) { const wm = wordmark(opts.wordmark, 0, 0); if (wm) { defs.push(logoFilters); body += wm; } }
+      if (opts.wordmark) { const wm = wordmark(opts.wordmark, 0, 0); if (wm) { defs.push(logoFilters); useTextFilters(defs); body += wm; } }
       out.push({ file, svg: svgDocument(w, def(c.boxHeight, (shape.insetTop || 0) + shape.height), defs, body) });
     }
     // value boxes (feed colours) and column ramps
@@ -493,10 +621,10 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
       defs.push(`<linearGradient id="${id('ramp')}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${r.fill.color}" stop-opacity="0"/><stop offset="1" stop-color="${r.fill.color}" stop-opacity="1"/></linearGradient>`);
       out.push({ file, svg: svgDocument(w, h, defs, `<path data-component="ticker-column-ramp" d="${d}" fill="url(#${id('ramp')})"/>`) });
     }
-    out.push({ file: 'logo-line-logo.svg', svg: svgDocument(86, 37, [logoFilters], efnLogo(2, 1, 82, 35)) });
+    { const defs = [logoFilters]; useTextFilters(defs); out.push({ file: 'logo-line-logo.svg', svg: svgDocument(86, 37, defs, efnLogo(2, 1, 82, 35)) }); }
     return out;
   }
 
-  return { comp, resetIds, plate, logoFilters, efnLogo, wordmark, svgDocument, titleWidth, namePlateWidth, nameStrap, logoTicker, composite, elements,
+  return { comp, resetIds, refinements: RF, textFilters, textAttr, plate, plateStyles, plateStyle, stylePlate, plateSvg, logoFilters, efnLogo, wordmark, svgDocument, titleWidth, namePlateWidth, nameStrap, logoTicker, composite, elements,
     geom, shapePath, slantOffset, cornerGeom };
 }

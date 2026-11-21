@@ -13,6 +13,8 @@ import { registry, tokens, efnLogoSvg, wordmarks } from './assets.js';
 export { createRenderer, geom, shapePath, slantOffset, cornerGeom, f2, esc } from './lower-third.js';
 export { roundedSkewedCardPathUniform, cardCorners } from '../lib/roundedSkewedCardPathUniform.js';
 export { registry, tokens, efnLogoSvg, wordmarks, sampleTickerPayload } from './assets.js';
+export { ease, cssEase } from './motion.js';
+export { designTokens } from './design-tokens.js';
 
 // A renderer with the package's own data and assets. options: { idPrefix } (and any createRenderer option to
 // override, e.g. a modified registry).

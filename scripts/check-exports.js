@@ -6,7 +6,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ENTRIES = [['src/index.js', 'src/index.d.ts'], ['src/lower-third.js', 'src/lower-third.d.ts'],
-  ['lib/roundedSkewedCardPathUniform.js', 'lib/roundedSkewedCardPathUniform.d.ts']];
+  ['lib/roundedSkewedCardPathUniform.js', 'lib/roundedSkewedCardPathUniform.d.ts'],
+  ['src/design-tokens.js', 'src/design-tokens.d.ts'], ['src/motion.js', 'src/motion.d.ts'], ['src/elements/efn-plate.js', 'src/elements/efn-plate.d.ts']];
 
 let failed = false;
 for (const [js, dts] of ENTRIES) {

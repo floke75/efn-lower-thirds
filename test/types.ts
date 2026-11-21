@@ -7,7 +7,7 @@ import {
   registry, tokens, efnLogoSvg, wordmarks, sampleTickerPayload,
   geom, shapePath, slantOffset, cornerGeom, f2, esc,
   roundedSkewedCardPathUniform, cardCorners,
-  type Renderer, type NameStrap, type LogoTicker, type Content, type MeasureText, type Shape, type TickerRow, type Component, type LogoBoxVariant,
+  type Renderer, type NameStrap, type LogoTicker, type PlateStyleName, type Content, type MeasureText, type Shape, type TickerRow, type Component, type LogoBoxVariant,
 } from 'efn-lower-thirds';
 import { createRenderer as createRendererOnly, type RendererOptions } from 'efn-lower-thirds/renderer';
 import { roundedSkewedCardPathUniform as pathOnly, cardCorners as cornersOnly, type CardPosition } from 'efn-lower-thirds/geometry';
@@ -41,6 +41,15 @@ const tickerDefs: string[] = [];
 const lbt: LogoTicker = lt.logoTicker({ logo: 'borslunch', pages: [sampleTickerPayload.data.open[0]] }, { defs: tickerDefs });
 const tickerMarkup: string = lbt.logoPlate + lbt.wordmark + lbt.tickerPlate + `<g clip-path="url(#${lbt.tickerClip})">${lbt.pages.join('')}</g>`;
 const colW: number = lbt.layout.list.colW;
+const styleName: PlateStyleName = lt.plateStyles[0];
+const styled: string = lt.stylePlate('navy', { width: 300, height: 50, slant: 'both', glint: true, defs: tickerDefs });
+const styledDoc: string = lt.plateSvg('beige', { width: 200, fluid: true });
+const styleText: string = lt.plateStyle('red').textColor;
+const exactLt = createLowerThird({ refinements: false });
+const shadingDefs: string = exactLt.textFilters + lt.textAttr('dark');
+const rimOpacity: number | undefined = lt.refinements?.textLight.rim.opacity;
+// @ts-expect-error unknown plate style
+lt.plateSvg('purple', { width: 10 });
 // @ts-expect-error logoTicker() needs the defs array
 lt.logoTicker({ logo: 'borslunch' }, {});
 const variant = (registry.components.find(c => c.id === 'logo-box')?.variants ?? [])[0] as LogoBoxVariant;
@@ -80,3 +89,20 @@ async function boot(): Promise<void> {
 const urls: string[] = fontFiles.map(f => f.url);
 // @ts-expect-error measureText returns a number
 const bad: MeasureText = () => 'wide';
+
+// ---------- design system ----------
+import { designTokens, ease, cssEase, type EaseName, type Gradient } from 'efn-lower-thirds';
+import { EfnPlate } from 'efn-lower-thirds/plate-element';
+const navyGradient: Gradient = designTokens.color.plate.navy;
+const overlap: number = designTokens.shape.overlap;
+const family: string[] = designTokens.font.family;
+const easeName: EaseName = 'slow';
+const eased: number = ease[easeName](0.5);
+const css: string = cssEase['sine.in'];
+// @ts-expect-error "slow" has no CSS equivalent
+const noCss: string = cssEase.slow;
+const plateEl: EfnPlate = document.createElement('efn-plate');
+plateEl.variant = 'beige-light';
+plateEl.restartGlint();
+// @ts-expect-error unknown variant
+plateEl.variant = 'purple';
