@@ -1,3 +1,4 @@
 * text=auto eol=lf
 *.woff binary
 *.png binary
+src/assets.js linguist-generated=true

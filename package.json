@@ -1,11 +1,39 @@
 {
   "name": "efn-lower-thirds",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "description": "EFN lower thirds as SVG for OGraf: browser/Node renderer, slant and corner geometry, design data and assets.",
   "type": "module",
-  "description": "EFN lower thirds as SVG for OGraf: plate geometry, rims, fills, glint, logos.",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./renderer": {
+      "types": "./src/lower-third.d.ts",
+      "default": "./src/lower-third.js"
+    },
+    "./geometry": {
+      "types": "./lib/roundedSkewedCardPathUniform.d.ts",
+      "default": "./lib/roundedSkewedCardPathUniform.js"
+    },
+    "./data/*": "./data/*",
+    "./assets/*": "./assets/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "data",
+    "assets",
+    "docs"
+  ],
+  "sideEffects": false,
   "scripts": {
-    "build": "node scripts/build-svgs.js",
+    "build": "node scripts/build-assets.js && node scripts/build-svgs.js",
+    "check": "node scripts/build-assets.js --check",
     "demo": "node scripts/serve.js"
   },
   "engines": {

@@ -1,25 +1,13 @@
-// Browser demo: the renderer from src/lower-third.js running live in the page.
-// It loads the registry, tokens and logo/wordmark SVGs over HTTP, measures text with the real AkkuratStd font
-// (canvas measureText) and re-renders the full lower third on every edit. This is the same path an OGraf
-// graphic takes at runtime.
-import { createRenderer, f2 } from '../src/lower-third.js';
+// Browser demo: the package running live in the page, exactly as an app or OGraf graphic would use it:
+// load the fonts, create a renderer with the built-in data, measure text with the real AkkuratStd font and
+// re-render the full lower third on every edit.
+import { createLowerThird, loadFonts, browserMeasureText, registry, sampleTickerPayload as payload, f2 } from '../src/index.js';
 
-const get = (url, as = 'json') => fetch(url).then(r => { if (!r.ok) throw new Error(`${url}: ${r.status}`); return r[as](); });
-
-const [registry, tokens, payload] = await Promise.all([
-  get('../data/element-registry.json'), get('../data/design-tokens.json'), get('../data/samples/ticker-payload.json')]);
+await loadFonts();
+const renderer = createLowerThird({ idPrefix: 'lt-' });
+const measureText = browserMeasureText();
 const comp = (id) => registry.components.find(c => c.id === id);
 const logoVariants = comp('logo-box').variants;
-const efnLogoSvg = await get('../' + comp('logo-line-logo').asset, 'text');
-const wordmarks = Object.fromEntries(await Promise.all(logoVariants.filter(v => v.clientWordmark?.supplied)
-  .map(async v => [v.id, await get('../' + v.clientWordmark.file, 'text')])));
-
-const renderer = createRenderer({ registry, tokens, efnLogoSvg, wordmarks, idPrefix: 'lt-' });
-
-// Text advance with the broadcast font: wait for both weights, then measure on a canvas.
-await Promise.all(['700', '400'].map(w => document.fonts.load(`${w} 40px AkkuratStd`)));
-const ctx = document.createElement('canvas').getContext('2d');
-const measureText = (text, { weight, sizePx }) => { ctx.font = `${weight} ${sizePx}px AkkuratStd`; return ctx.measureText(text).width; };
 
 // controls
 const form = document.getElementById('controls'), stage = document.getElementById('stage'), readout = document.getElementById('readout');
