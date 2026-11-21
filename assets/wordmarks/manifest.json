@@ -1,0 +1,11 @@
+{
+  "_about": "Programme wordmarks supplied by EFN (2026-11-09) to replace the wordmarks baked into the Flowics logo-box videos. Files are unmodified Illustrator exports; names normalised to ASCII. Fill in the files is #f2f2f2; on air the wordmark measures #ebebeb (see element-registry.json logo-box.wordmark).",
+  "files": [
+    { "id": "borslunch", "file": "borslunch.svg", "originalName": "Börslunch.svg", "logoBoxVariant": "borslunch" },
+    { "id": "direkt", "file": "direkt.svg", "originalName": "Direkt.svg", "logoBoxVariant": "direkt" },
+    { "id": "morgon", "file": "morgon.svg", "originalName": "Morgon.svg", "logoBoxVariant": "morgon" },
+    { "id": "ravaror", "file": "ravaror.svg", "originalName": "Råvaror.svg", "logoBoxVariant": "ravaror" },
+    { "id": "nobel", "file": "nobel.svg", "originalName": "Nobel.svg", "logoBoxVariant": "nobel" }
+  ],
+  "notSupplied": ["borsfrukost", "marknad", "update"]
+}

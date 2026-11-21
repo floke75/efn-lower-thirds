@@ -1,0 +1,464 @@
+=== Regions Kit s1
+REGION "NAMN-EGEN-RAD" z34
+  OVERLAY "NAMN1" id=NAMN1 z3
+    Container "rad2" x0 y880.41 w1920 h71
+      Container "ALT-TITLE-LÅNG mask" x595.01 y881.12 w1312.78 h70.29 mask=image:TITEL_LANG.png
+        Text "Titel" x595.01 y880.55 w1312.78 h70.85 font="AkkuratStd 700 42px" color=rgb(26, 26, 26) mode=fitContainer "Titel kan vara ganska lång" anim[in=linearWipeRightIn/800+400 out=linearWipeLeftOut/0+450]
+    Container "rad2" x0 y880.41 w1920 h71
+      Container "ALT-NAMNSKYLT-LÅNG mask" x11 y880.41 w588.5 h71 mask=image:ALT-NAMNSKYLT-LANG_hard_mask.png
+        Text "Namn" x11 y883.96 w575 h63.9 font="AkkuratStd 700 49px" color=rgb(240, 240, 240) mode=fitOneLine "Namn Efternamn" anim[in=linearWipeRightIn/550+400 out=linearWipeLeftOut/450+400]
+        Video "ALT-NAMNSKYLT-LÅNG" x11 y880.41 w588.5 h71 video=ALT-NAMNSKYLT-LANG_slice.webm anim[in=slideLeftSolidIn/400+400 out=slideLeftSolidOut/470+400]
+  OVERLAY "NAMN2" id=NAMN2 z2
+    Container "rad2" x0 y880.41 w1920 h71
+      Container "ALT-TITLE-LÅNG mask" x595.01 y881.12 w1312.78 h70.29 mask=image:TITEL_LANG.png
+        Text "Titel" x595.01 y880.55 w1312.78 h70.85 font="AkkuratStd 700 42px" color=rgb(26, 26, 26) mode=fitContainer "Titel kan vara ganska lång" anim[in=linearWipeRightIn/800+400 out=linearWipeLeftOut/0+450]
+    Container "rad2" x0 y880.41 w1920 h71
+      Container "ALT-NAMNSKYLT-LÅNG mask" x11 y880.41 w588.5 h71 mask=image:ALT-NAMNSKYLT-LANG_hard_mask.png
+        Text "Namn" x11 y883.96 w575 h63.9 font="AkkuratStd 700 49px" color=rgb(240, 240, 240) mode=fitOneLine "Namn Efternamn" anim[in=linearWipeRightIn/550+400 out=linearWipeLeftOut/450+400]
+        Video "ALT-NAMNSKYLT-LÅNG" x11 y880.41 w588.5 h71 video=ALT-NAMNSKYLT-LANG_slice.webm anim[in=slideLeftSolidIn/400+400 out=slideLeftSolidOut/470+400]
+  OVERLAY "NAMNSKYLT-EGEN-RAD" id=NAMN-ER z1
+    Container "rad2" x0 y880.41 w1920 h71
+      Container "ALT-TITLE-LÅNG mask" x595.01 y881.12 w1312.78 h70.29 mask=image:TITEL_LANG.png
+        Text "Titel" x595.01 y880.55 w1312.78 h70.85 font="AkkuratStd 700 42px" color=rgb(26, 26, 26) mode=fitContainer "Titel kan vara ganska lång" anim[in=linearWipeRightIn/800+400 out=linearWipeLeftOut/0+450]
+    Container "rad2" x0 y880.41 w1920 h71
+      Container "ALT-NAMNSKYLT-LÅNG mask" x11 y880.41 w588.5 h71 mask=image:ALT-NAMNSKYLT-LANG_hard_mask.png
+        Text "Namn" x11 y883.96 w575 h63.9 font="AkkuratStd 700 49px" color=rgb(240, 240, 240) mode=fitOneLine "Namn Efternamn" anim[in=linearWipeRightIn/550+400 out=linearWipeLeftOut/450+400]
+        Video "ALT-NAMNSKYLT-LÅNG" x11 y880.41 w588.5 h71 video=ALT-NAMNSKYLT-LANG_slice.webm anim[in=slideLeftSolidIn/400+400 out=slideLeftSolidOut/470+400]
+REGION "EFN logo top" z32
+  OVERLAY "EFN logo top" id=LOGOTOP z30
+    Container "Container" x0 y0 w1920 h1080
+      Image "Image" x1689.6 y23.64 w237.54 h82.04
+REGION "PLATS eller INFO" z14
+  OVERLAY "PLATS ALT INFO SPLIT" id=undefined z2
+    Container "rad0" x0 y21.6 w1920 h70.5
+      Container "LÅNG-LOCATIONSKYLT mask" x1034.88 y21.6 w963 h70.5 mask=image:LANG-LOCATIONSKYLT-LUTAD-START_hard_mask.png
+        Text "PLATS alt INFO höger" x1034.88 y21.04 w863.76 h71.07 font="AkkuratStd 700 42px" color=rgb(240, 240, 240) mode=fitContainer "Plats eller info höger" anim[in=linearWipeRightIn/0+400 out=linearWipeLeftOut/0+450]
+    Container "rad0" x0 y21.6 w1920 h70.5
+      Container "LÅNG-LOCATIONSKYLT mask" x22 y21.6 w963 h70.5 mask=image:LANG-LOCATIONSKYLT_hard_mask.png
+        Text "PLATS alt INFO vänster" x22 y21.04 w963 h71.07 font="AkkuratStd 700 42px" color=rgb(240, 240, 240) mode=fitContainer "Plats eller info vänster" anim[in=linearWipeRightIn/0+400 out=linearWipeLeftOut/0+450]
+  OVERLAY "PLATS ALT INFO" id=undefined z10
+    Container "rad0" x0 y13.5 w1920 h70.5
+      Container "LÅNG-LOCATIONSKYLT mask" x11 y13.5 w963 h70.5 mask=image:LANG-LOCATIONSKYLT_hard_mask.png
+        Text "PLATS alt INFO" x11 y12.94 w963 h71.07 font="AkkuratStd 700 42px" color=rgb(240, 240, 240) mode=fitContainer "Plats eller info" anim[in=linearWipeRightIn/0+400 out=linearWipeLeftOut/0+450]
+REGION "LOGOBOX" z29
+  OVERLAY "LOGOBOX-NOBEL" id=undefined z6
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "LOGOBOX-UPDATE mask" x11 y956.01 w210.51 h71 mask=image:LOGOBOX-UPDATE_hard_mask.png
+        Video "LOGOBOX-NOBEL" x11 y956.01 w210.51 h71 video=LOGOBOX-NOBEL__slice_vitfix_alt2.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "LOGOBOX-MORGON" id=undefined z9
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "LOGOBOX-RÅVAROR mask" x11 y956.01 w255.49 h71 mask=image:LOGOBOX-RAVAROR_hard_mask.png
+        Video "LOGOBOX-MORGON" x11 y956.01 w255.49 h71 video=LOGOBOX-MORGON_slice_vitfix.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "LOGOBOX-UPDATE" id=BOXUP z5
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "LOGOBOX-UPDATE mask" x11 y956.01 w210.51 h71 mask=image:LOGOBOX-UPDATE_hard_mask.png
+        Video "LOGOBOX-UPDATE" x11 y956.01 w210.51 h71 video=LOGOBOX-UPDATE__slice_vitfix.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "LOGOBOX-DIREKT" id=BOXDI z7
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "LOGOBOX-DIREKT mask" x11 y956.01 w216 h71 mask=image:LOGOBOX-DIREKT_hard_mask.png
+        Video "LOGOBOX-DIREKT" x11 y956.01 w216 h71 video=LOGOBOX-DIREKT_slice_vitfix.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "LOGOBOX-RÅVAROR" id=BOXRA z8
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "LOGOBOX-RÅVAROR mask" x11 y956.01 w255.49 h71 mask=image:LOGOBOX-RAVAROR_hard_mask.png
+        Video "LOGOBOX-RÅVAROR" x11 y956.01 w255.49 h71 video=LOGOBOX-RAVAROR_slice_vitfix.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "LOGOBOX-MARKNAD" id=BOXMA z10
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "LOGOBOX-MARKNAD mask" x11 y956.01 w279 h71 mask=image:LOGOBOX-MARKNAD_hard_mask.png
+        Video "LOGOBOX-MARKNAD vit korr" x11 y956.01 w279 h71 video=LOGOBOX-MARKNAD_slice_vitfix.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "LOGOBOX-BÖRSLUNCH" id=BOXBL z11
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "LOGOBOX-BÖRSLUNCH mask" x11 y956.01 w335 h71 mask=image:LOGOBOX-BORSLUNCH_hard_mask.png
+        Video "LOGOBOX-BÖRSLUNCH" x11 y956.01 w335 h71 video=LOGOBOX-BORSLUNCH_slice_vitfix.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "LOGOBOX-BÖRSFRUKOST" id=BOXBF z12
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "LOGOBOX-BÖRSFRUKOST mask" x11 y956.01 w392.01 h71 mask=image:LOGOBOX-BORSFRUKOST_hard_mask.png
+        Video "LOGOBOX-BÖRSFRUKOST" x11 y956.01 w392.01 h71 video=LOGOBOX-BORSFRUKOST_slice_vitfix.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/1000+400]
+  OVERLAY "NAMNSKYLT" id=NAMN z3
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "ALT-TITLE-LÅNG mask" x595.01 y956.72 w1312.78 h70.29 mask=image:TITEL_LANG.png
+        Text "Titel" x595.01 y956.15 w1312.78 h70.85 font="AkkuratStd 700 42px" color=rgb(26, 26, 26) mode=fitContainer "Titel kan vara ganska lång" anim[in=linearWipeRightIn/800+400 out=linearWipeLeftOut/0+450]
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "ALT-NAMNSKYLT-LÅNG mask" x11 y956.01 w588.5 h71 mask=image:ALT-NAMNSKYLT-LANG_hard_mask.png
+        Text "Namn" x11 y959.56 w575 h63.9 font="AkkuratStd 700 49px" color=rgb(240, 240, 240) mode=fitOneLine "Namn Efternamn" anim[in=linearWipeRightIn/550+400 out=linearWipeLeftOut/450+400]
+        Video "ALT-NAMNSKYLT-LÅNG" x11 y956.01 w588.5 h71 video=ALT-NAMNSKYLT-LANG_slice.webm anim[in=slideLeftSolidIn/400+400 out=slideLeftSolidOut/470+400]
+REGION "TICKER-LINE" z28
+  OVERLAY "TEXT-LINE-NOBEL" id=undefined z5
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-UPDATE mask" x217.5 y956.01 w1691.5 h71 mask=image:TICKER-LINE-UPDATE_hard_mask.png
+        Text "Text" x242.38 y959.56 w1654.83 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "Lång mening med mycket text, o" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-UPDATE" x217.5 y956.01 w1691.5 h71 video=TICKER-LINE-UPDATE_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-MORGON PRE" id=TICKMOPRE z10
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-RÅVAROR mask" x262 y956.01 w1647 h71 mask=image:TICKER-LINE-RAVAROR_hard_mask.png
+        Container "Anim Container" x262 y956.01 w1647 h71 mask=overflow anim[in=slideLeftBigIn/400+360 out=linearWipeLeftOut/0+200]
+          List "Dynamic List" x294.94 y957.43 w1614.06 h66.74 bind=n128:/pre
+            ListItem "List Item" x294.94 y957.43 w1614.06 h66.74 anim[in=slideLeftBigIn/700+500 out=slideRightBigOut/0+500]
+              Container "Container 3" x1505.48 y964.1 w403.51 h34.7 mask=gradient
+                Rectangle "Valuebox 3" x1505.48 y964.1 w403.51 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n612:/3/Color value
+              Container "Container 2" x1101.97 y964.1 w403.51 h34.7 mask=gradient
+                Rectangle "Valuebox 2" x1101.97 y964.1 w403.51 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n612:/2/Color value
+              Container "Container 1" x698.46 y964.1 w403.51 h34.7 mask=gradient
+                Rectangle "Valuebox 1" x698.46 y964.1 w403.51 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n612:/1/Color value
+              Container "Container 0" x294.94 y964.1 w403.51 h34.7 mask=gradient
+                Rectangle "Valuebox 0" x294.94 y964.1 w403.51 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n612:/0/Color value
+              Rectangle "Rectangle 2" x1101.97 y959.43 w403.51 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 1" x698.46 y959.43 w403.51 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 0" x294.94 y959.43 w403.51 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 3" x1505.48 y959.43 w403.51 h66.74 mask=image:TICKER-LINE-FADEBOX_END_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Text "Kort 0" x294.94 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n612:/0/Kort namn
+              Text "Value 3" x1505.48 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n612:/3/Procent string,n612:/0/Color value
+              Text "Long 3" x1505.48 y957.43 w403.51 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n612:/3/Eget namn
+              Text "Kort 3" x1505.48 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n612:/3/Kort namn
+              Text "Kort 2" x1101.97 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n612:/2/Kort namn
+              Text "Value 2" x1101.97 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n612:/2/Procent string
+              Text "Long 2" x1101.97 y957.43 w403.51 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n612:/2/Eget namn
+              Text "Long 1" x698.46 y957.43 w403.51 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n612:/1/Eget namn
+              Text "Value 1" x698.46 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n612:/1/Procent string
+              Text "Value 0" x294.94 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n612:/0/Procent string
+              Text "Long 0" x294.94 y957.43 w403.51 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n612:/0/Eget namn
+              Text "Kort 1" x698.46 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n612:/1/Kort namn
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-RÅVAROR mask" x262 y956.01 w1647 h71 mask=image:TICKER-LINE-RAVAROR_hard_mask.png
+        Video "TICKER-LINE-RÅVAROR" x262 y956.01 w1647 h71 video=TICKER-LINE-RAVAROR_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-MORGON OPEN" id=TICMOOPEN z9
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-RÅVAROR mask" x262 y956.01 w1647 h71 mask=image:TICKER-LINE-RAVAROR_hard_mask.png
+        Container "Anim Container" x262 y956.01 w1647 h71 mask=overflow anim[in=slideLeftBigIn/400+360 out=linearWipeLeftOut/0+200]
+          List "Dynamic List" x294.94 y957.43 w1614.06 h66.74 bind=n128:/open
+            ListItem "List Item" x294.94 y957.43 w1614.06 h66.74 anim[in=slideLeftBigIn/700+500 out=slideRightBigOut/0+500]
+              Container "Container 3" x1505.48 y964.1 w403.51 h34.7 mask=gradient
+                Rectangle "Valuebox 3" x1505.48 y964.1 w403.51 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n645:/3/Color value
+              Container "Container 2" x1101.97 y964.1 w403.51 h34.7 mask=gradient
+                Rectangle "Valuebox 2" x1101.97 y964.1 w403.51 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n645:/2/Color value
+              Container "Container 1" x698.46 y964.1 w403.51 h34.7 mask=gradient
+                Rectangle "Valuebox 1" x698.46 y964.1 w403.51 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n645:/1/Color value
+              Container "Container 0" x294.94 y964.1 w403.51 h34.7 mask=gradient
+                Rectangle "Valuebox 0" x294.94 y964.1 w403.51 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n645:/0/Color value
+              Rectangle "Rectangle 2" x1101.97 y959.43 w403.51 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 1" x698.46 y959.43 w403.51 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 0" x294.94 y959.43 w403.51 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 3" x1505.48 y959.43 w403.51 h66.74 mask=image:TICKER-LINE-FADEBOX_END_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Text "Kort 0" x294.94 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n645:/0/Kort namn
+              Text "Value 3" x1505.48 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n645:/3/Procent string,n645:/0/Color value
+              Text "Long 3" x1505.48 y957.43 w403.51 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n645:/3/Eget namn
+              Text "Kort 3" x1505.48 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n645:/3/Kort namn
+              Text "Kort 2" x1101.97 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n645:/2/Kort namn
+              Text "Value 2" x1101.97 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n645:/2/Procent string
+              Text "Long 2" x1101.97 y957.43 w403.51 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n645:/2/Eget namn
+              Text "Long 1" x698.46 y957.43 w403.51 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n645:/1/Eget namn
+              Text "Value 1" x698.46 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n645:/1/Procent string
+              Text "Value 0" x294.94 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n645:/0/Procent string
+              Text "Long 0" x294.94 y957.43 w403.51 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n645:/0/Eget namn
+              Text "Kort 1" x698.46 y957.43 w403.51 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n645:/1/Kort namn
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-RÅVAROR mask" x262 y956.01 w1647 h71 mask=image:TICKER-LINE-RAVAROR_hard_mask.png
+        Video "TICKER-LINE-RÅVAROR" x262 y956.01 w1647 h71 video=TICKER-LINE-RAVAROR_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TEXT-LINE-MORGON" id=TEXTMO z8
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-RÅVAROR mask" x262 y956.01 w1647 h71 mask=image:TICKER-LINE-RAVAROR_hard_mask.png
+        Text "Text" x286.23 y959.56 w1611.29 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "Lång mening med mycket text, o" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-RÅVAROR" x262 y956.01 w1647 h71 video=TICKER-LINE-RAVAROR_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TEXT-LINE-DIREKT" id=TEXTDI z12
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-DIREKT mask" x222.51 y956.01 w1686.51 h71 mask=image:TICKER-LINE-DIREKT_hard_mask.png
+        Text "Text" x247.32 y959.56 w1649.95 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "Lång mening med mycket text, o" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-DIREKT" x222.51 y956.01 w1686.51 h71 video=TICKER-LINE-DIREKT_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-UPDATE" id=TICUP z4
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-UPDATE mask" x217.5 y956.01 w1691.5 h71 mask=image:TICKER-LINE-UPDATE_hard_mask.png
+        Text "Text" x242.38 y959.56 w1654.83 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "Lång mening med mycket text, o" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-UPDATE" x217.5 y956.01 w1691.5 h71 video=TICKER-LINE-UPDATE_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-BÖRSFRUKOST OPEN" id=TICBF3 z21
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-MARKNAD mask" x398.5 y956.01 w1510.5 h71 mask=image:TICKER-LINE-MARKNAD_mask.png
+        Container "Anim Container" x398.5 y956.01 w1510.5 h71 mask=overflow anim[in=slideLeftBigIn/400+360 out=linearWipeLeftOut/0+200]
+          List "Dynamic List" x428.71 y957.43 w1480.29 h66.74 bind=n128:/open
+            ListItem "List Item" x428.71 y957.43 w1480.29 h66.74 anim[in=slideLeftBigIn/700+500 out=slideRightBigOut/0+500]
+              Container "Container 3" x1538.93 y964.1 w370.07 h34.7 mask=gradient
+                Rectangle "Valuebox 3" x1538.93 y964.1 w370.07 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n455:/3/Color value
+              Container "Container 2" x1168.85 y964.1 w370.07 h34.7 mask=gradient
+                Rectangle "Valuebox 2" x1168.85 y964.1 w370.07 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n455:/2/Color value
+              Container "Container 1" x798.78 y964.1 w370.07 h34.7 mask=gradient
+                Rectangle "Valuebox 1" x798.78 y964.1 w370.07 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n455:/1/Color value
+              Container "Container 0" x428.71 y964.1 w370.07 h34.7 mask=gradient
+                Rectangle "Valuebox 0" x428.71 y964.1 w370.07 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n455:/0/Color value
+              Rectangle "Rectangle 2" x1168.85 y959.43 w370.07 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 1" x798.78 y959.43 w370.07 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 0" x428.71 y959.43 w370.07 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 3" x1538.93 y959.43 w370.07 h66.74 mask=image:TICKER-LINE-FADEBOX_END_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Text "Kort 0" x428.71 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n455:/0/Kort namn
+              Text "Value 3" x1538.93 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n455:/3/Procent string,n455:/0/Color value
+              Text "Long 3" x1538.93 y957.43 w370.07 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n455:/3/Eget namn
+              Text "Kort 3" x1538.93 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n455:/3/Kort namn
+              Text "Kort 2" x1168.85 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n455:/2/Kort namn
+              Text "Value 2" x1168.85 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n455:/2/Procent string
+              Text "Long 2" x1168.85 y957.43 w370.07 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n455:/2/Eget namn
+              Text "Long 1" x798.78 y957.43 w370.07 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n455:/1/Eget namn
+              Text "Value 1" x798.78 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n455:/1/Procent string
+              Text "Value 0" x428.71 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n455:/0/Procent string
+              Text "Long 0" x428.71 y957.43 w370.07 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n455:/0/Eget namn
+              Text "Kort 1" x798.78 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n455:/1/Kort namn
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-BÖRSFRUKOST mask" x398.5 y956.01 w1510.5 h71 mask=image:TICKER-LINE-BORSFRUKOST_hard_mask.png
+        Video "TICKER-LINE-BÖRSFRUKOST" x398.5 y956.01 w1510.5 h71 video=TICKER-LINE-BORSFRUKOST_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-BÖRSLUNCH PRE" id=TICBL2 z18
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-BÖRSLUNCH mask" x341.49 y956.01 w1567.51 h71 mask=image:TICKER-LINE-BORSLUNCH_hard_mask.png
+        Container "Anim Container" x341.49 y956.01 w1567.51 h71 mask=overflow anim[in=slideLeftBigIn/400+360 out=linearWipeLeftOut/0+200]
+          List "Dynamic List" x372.84 y957.43 w1536.16 h66.74 bind=n128:/pre
+            ListItem "List Item" x372.84 y957.43 w1536.16 h66.74 anim[in=slideLeftBigIn/700+500 out=slideRightBigOut/0+500]
+              Container "Container 3" x1524.96 y964.1 w384.04 h34.7 mask=gradient
+                Rectangle "Valuebox 3" x1524.96 y964.1 w384.04 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n371:/3/Color value
+              Container "Container 2" x1140.92 y964.1 w384.04 h34.7 mask=gradient
+                Rectangle "Valuebox 2" x1140.92 y964.1 w384.04 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n371:/2/Color value
+              Container "Container 1" x756.88 y964.1 w384.04 h34.7 mask=gradient
+                Rectangle "Valuebox 1" x756.88 y964.1 w384.04 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n371:/1/Color value
+              Container "Container 0" x372.84 y964.1 w384.04 h34.7 mask=gradient
+                Rectangle "Valuebox 0" x372.84 y964.1 w384.04 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n371:/0/Color value
+              Rectangle "Rectangle 2" x1140.92 y959.43 w384.04 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 1" x756.88 y959.43 w384.04 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 0" x372.84 y959.43 w384.04 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 3" x1524.96 y959.43 w384.04 h66.74 mask=image:TICKER-LINE-FADEBOX_END_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Text "Kort 0" x372.84 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n371:/0/Kort namn
+              Text "Value 3" x1524.96 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n371:/3/Procent string,n371:/0/Color value
+              Text "Long 3" x1524.96 y957.43 w384.04 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n371:/3/Eget namn
+              Text "Kort 3" x1524.96 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n371:/3/Kort namn
+              Text "Kort 2" x1140.92 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n371:/2/Kort namn
+              Text "Value 2" x1140.92 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n371:/2/Procent string
+              Text "Long 2" x1140.92 y957.43 w384.04 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n371:/2/Eget namn
+              Text "Long 1" x756.88 y957.43 w384.04 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n371:/1/Eget namn
+              Text "Value 1" x756.88 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n371:/1/Procent string
+              Text "Value 0" x372.84 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n371:/0/Procent string
+              Text "Long 0" x372.84 y957.43 w384.04 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n371:/0/Eget namn
+              Text "Kort 1" x756.88 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n371:/1/Kort namn
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-BÖRSLUNCH mask" x341.49 y956.01 w1567.51 h71 mask=image:TICKER-LINE-BORSLUNCH_hard_mask.png
+        Text "Text" x364.55 y959.56 w1533.52 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-BÖRSLUNCH" x341.49 y956.01 w1567.51 h71 video=TICKER-LINE-BORSLUNCH_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-BÖRSLUNCH OPEN" id=TICBL z17
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-BÖRSLUNCH mask" x341.49 y956.01 w1567.51 h71 mask=image:TICKER-LINE-BORSLUNCH_hard_mask.png
+        Container "Anim Container" x341.49 y956.01 w1567.51 h71 mask=overflow anim[in=slideLeftBigIn/400+360 out=linearWipeLeftOut/0+200]
+          List "Dynamic List" x372.84 y957.43 w1536.16 h66.74 bind=n128:/open
+            ListItem "List Item" x372.84 y957.43 w1536.16 h66.74 anim[in=slideLeftBigIn/700+500 out=slideRightBigOut/0+500]
+              Text "Long 0" x372.84 y957.43 w384.04 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n337:/0/Eget namn
+              Container "Container 3" x1524.96 y964.1 w384.04 h34.7 mask=gradient
+                Rectangle "Valuebox 3" x1524.96 y964.1 w384.04 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n337:/3/Color value
+              Container "Container 2" x1140.92 y964.1 w384.04 h34.7 mask=gradient
+                Rectangle "Valuebox 2" x1140.92 y964.1 w384.04 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n337:/2/Color value
+              Container "Container 1" x756.88 y964.1 w384.04 h34.7 mask=gradient
+                Rectangle "Valuebox 1" x756.88 y964.1 w384.04 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n337:/1/Color value
+              Container "Container 0" x372.84 y964.1 w384.04 h34.7 mask=gradient
+                Rectangle "Valuebox 0" x372.84 y964.1 w384.04 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n337:/0/Color value
+              Rectangle "Rectangle 2" x1140.92 y959.43 w384.04 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 1" x756.88 y959.43 w384.04 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 0" x372.84 y959.43 w384.04 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 3" x1524.96 y959.43 w384.04 h66.74 mask=image:TICKER-LINE-FADEBOX_END_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Text "Kort 0" x372.84 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n337:/0/Kort namn
+              Text "Value 3" x1524.96 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n337:/3/Procent string,n337:/0/Color value
+              Text "Long 3" x1524.96 y957.43 w384.04 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n337:/3/Eget namn
+              Text "Kort 3" x1524.96 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n337:/3/Kort namn
+              Text "Kort 2" x1140.92 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n337:/2/Kort namn
+              Text "Value 2" x1140.92 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n337:/2/Procent string
+              Text "Long 2" x1140.92 y957.43 w384.04 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n337:/2/Eget namn
+              Text "Long 1" x756.88 y957.43 w384.04 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n337:/1/Eget namn
+              Text "Value 1" x756.88 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n337:/1/Procent string
+              Text "Value 0" x372.84 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n337:/0/Procent string
+              Text "Kort 1" x756.88 y957.43 w384.04 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n337:/1/Kort namn
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-BÖRSLUNCH mask" x341.49 y956.01 w1567.51 h71 mask=image:TICKER-LINE-BORSLUNCH_hard_mask.png
+        Text "Text" x364.55 y959.56 w1533.52 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-BÖRSLUNCH" x341.49 y956.01 w1567.51 h71 video=TICKER-LINE-BORSLUNCH_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TEXT-LINE-BÖRSLUNCH" id=TEXTBL z19
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-BÖRSLUNCH mask" x341.49 y956.01 w1567.51 h71 mask=image:TICKER-LINE-BORSLUNCH_hard_mask.png
+        Text "Text" x364.55 y959.56 w1533.52 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-BÖRSLUNCH" x341.49 y956.01 w1567.51 h71 video=TICKER-LINE-BORSLUNCH_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TEXT-LINE-BÖRSFRUKOST" id=TEXTBF z23
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-BÖRSFRUKOST mask" x398.5 y956.01 w1510.5 h71 mask=image:TICKER-LINE-BORSFRUKOST_hard_mask.png
+        Text "Text" x420.72 y959.56 w1477.75 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-BÖRSFRUKOST" x398.5 y956.01 w1510.5 h71 video=TICKER-LINE-BORSFRUKOST_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-BÖRSFRUKOST PRE" id=TICBF2 z22
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-MARKNAD mask" x398.5 y956.01 w1510.5 h71 mask=image:TICKER-LINE-MARKNAD_mask.png
+        Container "Anim Container" x398.5 y956.01 w1510.5 h71 mask=overflow anim[in=slideLeftBigIn/400+360 out=linearWipeLeftOut/0+200]
+          List "Dynamic List" x428.71 y957.43 w1480.29 h66.74 bind=n128:/pre
+            ListItem "List Item" x428.71 y957.43 w1480.29 h66.74 anim[in=slideLeftBigIn/700+500 out=slideRightBigOut/0+500]
+              Container "Container 3" x1538.93 y964.1 w370.07 h34.7 mask=gradient
+                Rectangle "Valuebox 3" x1538.93 y964.1 w370.07 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n235:/3/Color value
+              Container "Container 2" x1168.85 y964.1 w370.07 h34.7 mask=gradient
+                Rectangle "Valuebox 2" x1168.85 y964.1 w370.07 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n235:/2/Color value
+              Container "Container 1" x798.78 y964.1 w370.07 h34.7 mask=gradient
+                Rectangle "Valuebox 1" x798.78 y964.1 w370.07 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n235:/1/Color value
+              Container "Container 0" x428.71 y964.1 w370.07 h34.7 mask=gradient
+                Rectangle "Valuebox 0" x428.71 y964.1 w370.07 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n235:/0/Color value
+              Rectangle "Rectangle 2" x1168.85 y959.43 w370.07 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 1" x798.78 y959.43 w370.07 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 0" x428.71 y959.43 w370.07 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 3" x1538.93 y959.43 w370.07 h66.74 mask=image:TICKER-LINE-FADEBOX_END_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Text "Kort 0" x428.71 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n235:/0/Kort namn
+              Text "Value 3" x1538.93 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n235:/3/Procent string,n235:/0/Color value
+              Text "Long 3" x1538.93 y957.43 w370.07 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n235:/3/Eget namn
+              Text "Kort 3" x1538.93 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n235:/3/Kort namn
+              Text "Kort 2" x1168.85 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n235:/2/Kort namn
+              Text "Value 2" x1168.85 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n235:/2/Procent string
+              Text "Long 2" x1168.85 y957.43 w370.07 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n235:/2/Eget namn
+              Text "Long 1" x798.78 y957.43 w370.07 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n235:/1/Eget namn
+              Text "Value 1" x798.78 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n235:/1/Procent string
+              Text "Value 0" x428.71 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n235:/0/Procent string
+              Text "Long 0" x428.71 y957.43 w370.07 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n235:/0/Eget namn
+              Text "Kort 1" x798.78 y957.43 w370.07 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n235:/1/Kort namn
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-BÖRSFRUKOST mask" x398.5 y956.01 w1510.5 h71 mask=image:TICKER-LINE-BORSFRUKOST_hard_mask.png
+        Video "TICKER-LINE-BÖRSFRUKOST" x398.5 y956.01 w1510.5 h71 video=TICKER-LINE-BORSFRUKOST_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-DIREKT open test 2" id=TICDI z11
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-MARKNAD mask" x288 y956.01 w1612.8 h71 mask=image:TICKER-LINE-MARKNAD_mask.png
+        Container "Anim Container" x288 y956.01 w1612.8 h71 mask=overflow anim[in=slideLeftBigIn/400+360 out=linearWipeLeftOut/0+200]
+          List "Dynamic List" x320.26 y957.43 w1580.54 h66.74 bind=n128:/open
+            ListItem "List Item" x320.26 y957.43 w1580.54 h66.74 anim[in=slideLeftBigIn/700+500 out=slideRightBigOut/0+500]
+              Container "Container 3" x1505.66 y964.1 w395.14 h34.7 mask=gradient
+                Rectangle "Valuebox 3" x1505.66 y964.1 w395.14 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n504:/3/Color value
+              Container "Container 2" x1110.53 y964.1 w395.14 h34.7 mask=gradient
+                Rectangle "Valuebox 2" x1110.53 y964.1 w395.14 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n504:/2/Color value
+              Container "Container 1" x715.39 y964.1 w395.14 h34.7 mask=gradient
+                Rectangle "Valuebox 1" x715.39 y964.1 w395.14 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n504:/1/Color value
+              Container "Container 0" x320.26 y964.1 w395.14 h34.7 mask=gradient
+                Rectangle "Valuebox 0" x320.26 y964.1 w395.14 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n504:/0/Color value
+              Rectangle "Rectangle 2" x1110.53 y959.43 w395.14 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 1" x715.39 y959.43 w395.14 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 0" x320.26 y959.43 w395.14 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 3" x1505.66 y959.43 w395.14 h66.74 mask=image:TICKER-LINE-FADEBOX_END_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Text "Kort 0" x320.26 y957.43 w395.14 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n504:/0/Kort namn
+              Text "Value 3" x1505.66 y957.43 w395.14 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n504:/3/Procent string,n504:/0/Color value
+              Text "Long 3" x1505.66 y957.43 w395.14 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n504:/3/Eget namn
+              Text "Kort 3" x1505.66 y957.43 w395.14 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n504:/3/Kort namn
+              Text "Kort 2" x1110.53 y957.43 w395.14 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n504:/2/Kort namn
+              Text "Value 2" x1110.53 y957.43 w395.14 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n504:/2/Procent string
+              Text "Long 2" x1110.53 y957.43 w395.14 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n504:/2/Eget namn
+              Text "Long 1" x715.39 y957.43 w395.14 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n504:/1/Eget namn
+              Text "Value 1" x715.39 y957.43 w395.14 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n504:/1/Procent string
+              Text "Value 0" x320.26 y957.43 w395.14 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n504:/0/Procent string
+              Text "Long 0" x320.26 y957.43 w395.14 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n504:/0/Eget namn
+              Text "Kort 1" x715.39 y957.43 w395.14 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n504:/1/Kort namn
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-DIREKT mask" x222.51 y956.01 w1686.51 h71 mask=image:TICKER-LINE-DIREKT_hard_mask.png
+        Video "TICKER-LINE-DIREKT" x222.51 y956.01 w1686.51 h71 video=TICKER-LINE-DIREKT_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-RÅVAROR" id=TICRA z13
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-RÅVAROR mask" x262 y956.01 w1647 h71 mask=image:TICKER-LINE-RAVAROR_hard_mask.png
+        Text "Text" x286.23 y959.56 w1611.29 h71 font="AkkuratStd 400 46px" color=rgb(26, 26, 26) "Lång mening med mycket text, o" anim[in=linearWipeRightIn/0+500 out=linearWipeLeftOut/0+400]
+        Video "TICKER-LINE-RÅVAROR" x262 y956.01 w1647 h71 video=TICKER-LINE-RAVAROR_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+  OVERLAY "TICKER-LINE-MARKNAD" id=TICMA z15
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-MARKNAD mask" x286 y956.01 w1623 h71 mask=image:TICKER-LINE-MARKNAD_mask.png
+        Container "Anim Container" x286 y956.01 w1623 h71 mask=overflow anim[in=slideLeftBigIn/400+360 out=linearWipeLeftOut/0+200]
+          List "Dynamic List" x318.46 y957.43 w1590.54 h66.74 bind=n128:/pre
+            ListItem "List Item" x318.46 y957.43 w1590.54 h66.74 anim[in=slideLeftBigIn/700+500 out=slideRightBigOut/0+500]
+              Container "Container 3" x1511.36 y964.1 w397.63 h34.7 mask=gradient
+                Rectangle "Valuebox 3" x1511.36 y964.1 w397.63 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n152:/3/Color value
+              Container "Container 2" x1113.73 y964.1 w397.63 h34.7 mask=gradient
+                Rectangle "Valuebox 2" x1113.73 y964.1 w397.63 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n152:/2/Color value
+              Container "Container 1" x716.1 y964.1 w397.63 h34.7 mask=gradient
+                Rectangle "Valuebox 1" x716.1 y964.1 w397.63 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n152:/1/Color value
+              Container "Container 0" x318.46 y964.1 w397.63 h34.7 mask=gradient
+                Rectangle "Valuebox 0" x318.46 y964.1 w397.63 h34.7 mask=image:VALUES-FADEBOX_v2.png bg=[{"style":"solid","solid":"#000"}] bind=n152:/0/Color value
+              Rectangle "Rectangle 2" x1113.73 y959.43 w397.63 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 1" x716.1 y959.43 w397.63 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 0" x318.46 y959.43 w397.63 h66.74 mask=image:TICKER-LINE-FADEBOX_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Rectangle "Rectangle 3" x1511.36 y959.43 w397.63 h66.74 mask=image:TICKER-LINE-FADEBOX_END_solid.png bg=[{"style":"gradient","gradient":{"angle":90,"stops":[{"color":"#e0d1ad","opacity
+              Text "Kort 0" x318.46 y957.43 w397.63 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n152:/0/Kort namn
+              Text "Value 3" x1511.36 y957.43 w397.63 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n152:/3/Procent string,n152:/0/Color value
+              Text "Long 3" x1511.36 y957.43 w397.63 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n152:/3/Eget namn
+              Text "Kort 3" x1511.36 y957.43 w397.63 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n152:/3/Kort namn
+              Text "Kort 2" x1113.73 y957.43 w397.63 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n152:/2/Kort namn
+              Text "Value 2" x1113.73 y957.43 w397.63 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n152:/2/Procent string
+              Text "Long 2" x1113.73 y957.43 w397.63 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n152:/2/Eget namn
+              Text "Long 1" x716.1 y957.43 w397.63 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n152:/1/Eget namn
+              Text "Value 1" x716.1 y957.43 w397.63 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n152:/1/Procent string
+              Text "Value 0" x318.46 y957.43 w397.63 h66.74 font="AkkuratStd 700 32px" color=rgb(255, 255, 255) "New text" bind=n152:/0/Procent string
+              Text "Long 0" x318.46 y957.43 w397.63 h66.74 font="AkkuratStd 400 18px" color=rgb(26, 26, 26) "New text" bind=n152:/0/Eget namn
+              Text "Kort 1" x716.1 y957.43 w397.63 h66.74 font="AkkuratStd 700 32px" color=rgb(26, 26, 26) "New text" bind=n152:/1/Kort namn
+    Container "rad2" x0 y956.01 w1920 h71
+      Container "TICKER-LINE-MARKNAD mask" x286 y956.01 w1623 h71 mask=image:TICKER-LINE-MARKNAD_hard_mask.png
+        Video "TICKER-LINE-MARKNAD" x286 y956.01 w1623 h71 video=TICKER-LINE-MARKNAD_slice.webm anim[in=slideLeftSolidIn/0+500 out=slideLeftSolidOut/0+400]
+REGION "FULL-SCREEN" z33
+  OVERLAY "NOBEL Slutskylt" id=undefined z13
+    Container "Container" x0 y0 w1920 h1080
+      Container "Producent" x72.71 y108 w893.03 h150.47 anim[in=slideLeftSolidIn/590+600 out=undefined/undefined+undefined]
+        Text "Red" x72.71 y108 w893.03 h75.23 font="AkkuratStd 400 italic 42px" color=rgb(255, 255, 255) mode=fitContainer "Redaktör:"
+        Text "Namn" x72.71 y177.21 w1789.88 h75.23 font="AkkuratStd 700 42px" color=rgb(255, 255, 255) mode=fitContainer "Namn Efternamn"
+      Container "Red" x72.71 y280.8 w1756.76 h150.47 anim[in=slideLeftSolidIn/885+600 out=undefined/undefined+undefined]
+        Text "Red" x72.71 y280.8 w1756.76 h75.23 font="AkkuratStd 400 italic 42px" color=rgb(255, 255, 255) mode=fitContainer "Redaktör:"
+        Text "Namn" x72.71 y350.01 w3463.4 h75.23 font="AkkuratStd 700 42px" color=rgb(255, 255, 255) mode=fitContainer "Namn EfternamnNamn EfternamnNa"
+      Container "Bild" x72.71 y464.4 w893.03 h150.47 anim[in=slideLeftSolidIn/1250+600 out=undefined/undefined+undefined]
+        Text "Bild" x72.71 y464.4 w893.03 h75.23 font="AkkuratStd 400 italic 42px" color=rgb(255, 255, 255) mode=fitContainer "Bildproducent:"
+        Text "Namn" x72.71 y533.61 w893.03 h75.23 font="AkkuratStd 700 42px" color=rgb(255, 255, 255) mode=fitContainer "Namn Efternamn"
+      Container "Utgiv" x72.71 y669.6 w893.03 h150.47 anim[in=slideLeftSolidIn/1590+600 out=undefined/undefined+undefined]
+        Text "Utgiv" x72.71 y669.6 w893.03 h75.23 font="AkkuratStd 400 italic 42px" color=rgb(255, 255, 255) mode=fitContainer "Ansvarig utgivare:"
+        Text "Namn" x72.71 y738.81 w893.03 h75.23 font="AkkuratStd 700 42px" color=rgb(255, 255, 255) mode=fitContainer "Anders Hägerstrand"
+      Video "Video" x0 y849.96 w1920 h150.01 video=SLUTCRED-BAND-NOBEL_for_flowics.webm
+  OVERLAY "ED_startskylt" id=STARTDI z2
+    Container "Container" x0 y0 w1920 h1080
+      Rectangle "Rectangle" x0 y0 w1920 h1080 bg=[{"style":"gradient","gradient":{"angle":0,"stops":[{"color":"#366c9a","opacity"
+      Text "Text" x1.23 y632.11 w1920 h193.9 font="Roboto 500 42px" color=rgb(229, 229, 229) mode=fitContainer "Startar strax"
+      Image "Image" x0 y361.8 w1920 h222.37
+      Rectangle "Rectangle" x0 y0 w1920 h1080 bg=[{"style":"solid","solid":"rgb(30, 31, 35)"}]
+  OVERLAY "Börslunch start" id=STARTBL z9
+    Container "Container" x0 y0 w1920 h1080
+      Rectangle "Rectangle" x0 y0 w1920 h1080 bg=[{"style":"gradient","gradient":{"angle":0,"stops":[{"color":"#366c9a","opacity"
+      Text "Dagens gäster" x0 y777.6 w1920 h272.27 font="Roboto 400 italic 42px" color=rgb(229, 229, 229) mode=fitContainer "Namn Efternamn"
+      Text "Dagens tema" x0 y540 w1920 h119.21 font="Roboto 400 italic 42px" color=rgb(229, 229, 229) mode=fitContainer "Dagens tema, en mening"
+      Text "Dagens gäster rubrik" x0 y680.4 w1920 h86.4 font="Roboto 500 italic 42px" color=rgb(229, 229, 229) mode=fitContainer "Dagens gäster:"
+      Text "Text" x0 y442.8 w1920 h86.4 font="Roboto 500 italic 42px" color=rgb(229, 229, 229) mode=fitContainer "Dagens tema:"
+      Text "Text" x0 y270 w1920 h108 font="Roboto 500 42px" color=rgb(229, 229, 229) mode=fitContainer "startar 11:45"
+      Image "Image" x-1.23 y64.8 w1920 h194.4
+  OVERLAY "Slutskylt" id=SLUT z12
+    Container "Container" x0 y0 w1920 h1080
+      Container "Bild" x72.71 y399.6 w893.03 h150.47 anim[in=slideLeftSolidIn/1000+600 out=undefined/undefined+undefined]
+        Text "Bild" x72.71 y399.6 w893.03 h75.23 font="AkkuratStd 400 italic 42px" color=rgb(255, 255, 255) mode=fitContainer "Bildproducent:"
+        Text "Namn" x72.71 y468.81 w893.03 h75.23 font="AkkuratStd 700 42px" color=rgb(255, 255, 255) mode=fitContainer "Namn Efternamn"
+      Container "Utgiv" x72.71 y615.6 w893.03 h150.47 anim[in=slideLeftSolidIn/1400+600 out=undefined/undefined+undefined]
+        Text "Utgiv" x72.71 y615.6 w893.03 h75.23 font="AkkuratStd 400 italic 42px" color=rgb(255, 255, 255) mode=fitContainer "Ansvarig utgivare:"
+        Text "Namn" x72.71 y684.81 w893.03 h75.23 font="AkkuratStd 700 42px" color=rgb(255, 255, 255) mode=fitContainer "Anders Hägerstrand"
+      Container "Red" x72.71 y183.6 w893.03 h150.47 anim[in=slideLeftSolidIn/600+600 out=undefined/undefined+undefined]
+        Text "Red" x72.71 y183.6 w893.03 h75.23 font="AkkuratStd 400 italic 42px" color=rgb(255, 255, 255) mode=fitContainer "Redaktör:"
+        Text "Namn" x72.71 y252.81 w893.03 h75.23 font="AkkuratStd 700 42px" color=rgb(255, 255, 255) mode=fitContainer "Namn Efternamn"
+      Video "Video" x0 y849.96 w1920 h150.01 video=SLUTCRED-BAND-ROD.webm
+REGION "EFN LOGO line" z25
+  OVERLAY "EFN LOGO line endast datum" id=undefined z2
+    Container "rad3" x0 y1031.5 w1920 h37
+      Container "EFN-LINE-L mask" x11 y1031.5 w906.01 h37 mask=image:EFN-LINE-L_hard_mask.png
+        Video "EFN-LINE-L" x11 y1031.5 w906.01 h37 video=EFN-LINE-L_slice.webm anim[in=slideLeftSolidIn/0+600 out=slideLeftSolidOut/0+600]
+      Container "EFN-LOGO container" x916.99 y1031.5 w86 h37 anim[in=undefined/undefined+undefined out=expandOut/0+300]
+        Video "EFN-LOGO vit fix" x916.99 y1031.5 w86 h37 video=EFN-LOGO_slice_vit_fix.webm anim[in=expandIn/600+300 out=undefined/undefined+undefined]
+      Container "EFN-LINE-R mask" x1002.01 y1031.5 w907.01 h37 mask=image:EFN-LINE-R_hard_mask.png
+        Text "Datum" x1002.01 y1031.5 w893.4 h37 font="AkkuratStd 700 23px" color=rgb(235, 235, 235) "15 sep 2025" bind=n128:/Datum/0/Datum anim[in=linearWipeLeftIn/0+600 out=linearWipeRightOut/0+600]
+        Video "EFN-LINE-R" x1002.01 y1031.5 w907.01 h37 video=EFN-LINE-R_slice.webm anim[in=slideRightSolidIn/0+600 out=slideRightSolidOut/0+600]
+    Container "back gradient" x0 y1015.2 w1920 h64.8
+      Rectangle "Rectangle" x0 y1015.2 w1920 h64.8 bg=[{"style":"gradient","gradient":{"angle":0,"stops":[{"color":"#000000","opacity" anim[in=fadeIn/0+900 out=fadeOut/0+600]
+  OVERLAY "EFN LOGO line tom" id=undefined z1
+    Container "rad3" x0 y1031.5 w1920 h37
+      Container "EFN-LINE-L mask" x11 y1031.5 w906.01 h37 mask=image:EFN-LINE-L_hard_mask.png
+        Video "EFN-LINE-L" x11 y1031.5 w906.01 h37 video=EFN-LINE-L_slice.webm anim[in=slideLeftSolidIn/0+600 out=slideLeftSolidOut/0+600]
+      Container "EFN-LOGO container" x916.99 y1031.5 w86 h37 anim[in=undefined/undefined+undefined out=expandOut/0+300]
+        Video "EFN-LOGO vit fix" x916.99 y1031.5 w86 h37 video=EFN-LOGO_slice_vit_fix.webm anim[in=expandIn/600+300 out=undefined/undefined+undefined]
+      Container "EFN-LINE-R mask" x1002.01 y1031.5 w907.01 h37 mask=image:EFN-LINE-R_hard_mask.png
+        Video "EFN-LINE-R" x1002.01 y1031.5 w907.01 h37 video=EFN-LINE-R_slice.webm anim[in=slideRightSolidIn/0+600 out=slideRightSolidOut/0+600]
+    Container "back gradient" x0 y1015.2 w1920 h64.8
+      Rectangle "Rectangle" x0 y1015.2 w1920 h64.8 bg=[{"style":"gradient","gradient":{"angle":0,"stops":[{"color":"#000000","opacity" anim[in=fadeIn/0+900 out=fadeOut/0+600]
+  OVERLAY "EFN LOGO line" id=LOGO z9
+    Container "rad3" x0 y1031.5 w1920 h37
+      Container "EFN-LINE-L mask" x11 y1031.5 w906.01 h37 mask=image:EFN-LINE-L_hard_mask.png
+        Text "Klocka" x20.06 y1031.5 w896.95 h37 font="AkkuratStd 700 23px" color=rgb(235, 235, 235) "New text" bind=n120:/date/formattedTime anim[in=linearWipeRightIn/0+600 out=linearWipeLeftOut/0+600]
+        Video "EFN-LINE-L" x11 y1031.5 w906.01 h37 video=EFN-LINE-L_slice.webm anim[in=slideLeftSolidIn/0+600 out=slideLeftSolidOut/0+600]
+      Container "EFN-LOGO container" x916.99 y1031.5 w86 h37 anim[in=undefined/undefined+undefined out=expandOut/0+300]
+        Video "EFN-LOGO vit fix" x916.99 y1031.5 w86 h37 video=EFN-LOGO_slice_vit_fix.webm anim[in=expandIn/600+300 out=undefined/undefined+undefined]
+      Container "EFN-LINE-R mask" x1002.01 y1031.5 w907.01 h37 mask=image:EFN-LINE-R_hard_mask.png
+        Text "Datum" x1002.01 y1031.5 w893.4 h37 font="AkkuratStd 700 23px" color=rgb(235, 235, 235) "15 sep 2025" bind=n128:/Datum/0/Datum anim[in=linearWipeLeftIn/0+600 out=linearWipeRightOut/0+600]
+        Video "EFN-LINE-R" x1002.01 y1031.5 w907.01 h37 video=EFN-LINE-R_slice.webm anim[in=slideRightSolidIn/0+600 out=slideRightSolidOut/0+600]
+    Container "back gradient" x0 y1015.2 w1920 h64.8
+      Rectangle "Rectangle" x0 y1015.2 w1920 h64.8 bg=[{"style":"gradient","gradient":{"angle":0,"stops":[{"color":"#000000","opacity" anim[in=fadeIn/0+900 out=fadeOut/0+600]
+=== FullScreen s2
+REGION "Fullscreen" z1

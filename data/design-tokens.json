@@ -1,0 +1,604 @@
+{
+  "_about": "Measured design tokens. Component-level geometry, rims, sources and Flowics usage live in element-registry.json (the main entry point); this file holds the shared values. px = 1x on 1920x1080.",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "background": "transparent"
+  },
+  "shape": {
+    "function": "lib/roundedSkewedCardPathUniform.js",
+    "skewDeg": 8.45,
+    "radius": {
+      "name plate / logo box": 5.3,
+      "ticker": 5.4,
+      "title": 5.7,
+      "location": 5.8,
+      "logo line left": 3.5,
+      "logo line right": 3.7,
+      "value box": 2.4
+    },
+    "angleComp": 1,
+    "angleCompNote": "circle-equivalent (angleComp 1)",
+    "positions": {
+      "left (straight left, slanted right)": [
+        "name plate",
+        "logo box",
+        "location plate",
+        "logo line left"
+      ],
+      "right (slanted left, straight right)": [
+        "ticker / text line",
+        "logo line right"
+      ],
+      "middle (both slanted)": [
+        "title plate",
+        "value boxes",
+        "location split-right"
+      ]
+    },
+    "adjacentPlateOverlapPx": 4.5,
+    "edgePlacement": "slanted edges sit 0.35-0.8px outside the Flowics box (slantOutsetPx), straight edges ~0.3px inside (straightInsetPx) - per component in element-registry.json",
+    "radiusNote": "medians of the on-air corner fits (video x mask); masks alone fit 6px but are hard-edged and larger than the visible video corner"
+  },
+  "rows": {
+    "nameOwnRow": {
+      "y": 880.41,
+      "h": 71,
+      "note": "NAMN1/NAMN2/NAMN-ER overlays (region NAMN-EGEN-RAD, -7% offset)"
+    },
+    "mainRow": {
+      "y": 956.01,
+      "h": 71,
+      "note": "logo box + ticker/text line; NAMNSKYLT variant also sits here"
+    },
+    "logoLine": {
+      "y": 1031.5,
+      "h": 37
+    },
+    "logoLineBackGradient": {
+      "y": 1015.2,
+      "h": 64.8,
+      "fill": "linear bottom->top #000 @0.2 -> transparent"
+    },
+    "topRow": {
+      "y": 13.5,
+      "h": 70.5,
+      "note": "PLATS ALT INFO; split variant at y 21.6"
+    },
+    "safeLeft": 11,
+    "safeRight": 1909
+  },
+  "bevel": {
+    "model": "directional rim, lit from the upper left (~117 deg): per-edge layer colours + per-angle colours around each rounded corner + variation along each edge (element-registry.json components[].bevel: top/right/bottom/left, corners, along)",
+    "renderer": "scripts/build-svgs.js rimRings(): each layer is a continuous even-thickness ring (outer bleed minus concentric inset), deepest first; straight zones = edge colour + measured variation, corners = gradients on the measured per-angle colours, mapped on each ring's radius",
+    "verification": "edge pixels median RGB distance 1.4 vs the Flowics source; corner rim light mean |diff| 9-21 on a 150-430 range"
+  },
+  "fills": {
+    "_about": "Measured on the 2x Flowics sources. All plate gradients are horizontal (no tilt, no vertical shading) and scale with the plate width (objectBoundingBox x 0..1); sRGB interpolation. Verified: column-profile difference 0.5-0.7 levels (compression noise floor).",
+    "namePlate": [
+      [
+        0,
+        "#001125"
+      ],
+      [
+        0.3823,
+        "#072a45"
+      ],
+      [
+        0.4625,
+        "#0a2d4d"
+      ],
+      [
+        0.5635,
+        "#0b3655"
+      ],
+      [
+        0.6437,
+        "#103a5c"
+      ],
+      [
+        1,
+        "#1a507a"
+      ]
+    ],
+    "locationPlate": [
+      [
+        0,
+        "#001122"
+      ],
+      [
+        0.3411,
+        "#062842"
+      ],
+      [
+        1,
+        "#1f5b8b"
+      ]
+    ],
+    "logoLineLeft": [
+      [
+        0,
+        "#001327"
+      ],
+      [
+        0.2234,
+        "#04243c"
+      ],
+      [
+        0.4156,
+        "#09304e"
+      ],
+      [
+        0.574,
+        "#113c5e"
+      ],
+      [
+        0.6542,
+        "#144064"
+      ],
+      [
+        1,
+        "#205786"
+      ]
+    ],
+    "logoLineRight": [
+      [
+        0,
+        "#205886"
+      ],
+      [
+        0.1141,
+        "#1d507b"
+      ],
+      [
+        0.4964,
+        "#0f3656"
+      ],
+      [
+        0.5896,
+        "#0b2e4e"
+      ],
+      [
+        0.6958,
+        "#062842"
+      ],
+      [
+        1,
+        "#001225"
+      ]
+    ],
+    "red": [
+      [
+        0,
+        "#790012"
+      ],
+      [
+        1,
+        "#e10029"
+      ]
+    ],
+    "redNote": "straight 2-stop ramp, identical on all 7 red logo boxes (210-392px wide)",
+    "gold": {
+      "x1": 0.037,
+      "y1": 1.032,
+      "x2": 0.963,
+      "y2": -0.032,
+      "stops": [
+        [
+          0,
+          "#985a00"
+        ],
+        [
+          1,
+          "#e3bf1e"
+        ]
+      ],
+      "note": "diagonal, dark bottom-left -> light top-right (plane fit; residual rms = the glitter) + two-scale glitter texture",
+      "texture": {
+        "type": "glitter",
+        "fineBaseFrequency": 1.3,
+        "coarseBaseFrequency": 0.12,
+        "fineAmplitude": 0.36,
+        "coarseAmplitude": 0.28,
+        "seeds": [
+          7,
+          3
+        ],
+        "target": {
+          "highPassStd2x": 13.94,
+          "autocorr1px": 0.47,
+          "autocorr2px": 0.34,
+          "autocorr4px": 0.27
+        },
+        "achieved": {
+          "highPassStd2x": 14.2,
+          "autocorr1px": 0.48,
+          "autocorr2px": 0.36,
+          "autocorr4px": 0.32,
+          "meanRGB": [
+            189.1,
+            140,
+            16.1
+          ],
+          "sourceMeanRGB": [
+            189,
+            140,
+            14.9
+          ]
+        }
+      }
+    },
+    "tickerBeige": "#ede4d3",
+    "titleBeige": "#f0e7d7"
+  },
+  "glint": {
+    "_about": "Measured at 30 fps on the Flowics videos; per-element values in element-registry.json components[].glint",
+    "model": "white band with gaussian profile (sigma ~41-47px, FWHM ~97-110px), tilted dx/dy ~0.33 (leans ''), linear travel, measured opacity envelope (rises, peaks, falls; logo box plateaus)",
+    "perElement": {
+      "name-plate": {
+        "visibleFromS": 5.63,
+        "visibleToS": 10.47,
+        "centreFromPx": 80.26,
+        "centreToPx": 415.35,
+        "peakOpacity": 0.0989,
+        "sigmaPx": 46.5,
+        "envelope": [
+          [
+            5.63,
+            0
+          ],
+          [
+            6.44,
+            0.0385
+          ],
+          [
+            7.24,
+            0.0703
+          ],
+          [
+            8.05,
+            0.092
+          ],
+          [
+            8.86,
+            0.0684
+          ],
+          [
+            9.66,
+            0.0421
+          ],
+          [
+            10.47,
+            0
+          ]
+        ]
+      },
+      "logo-box": {
+        "visibleFromS": 8.4,
+        "visibleToS": 13.3,
+        "centreFromPx": 52.33,
+        "centreToPx": 371.4,
+        "peakOpacity": 0.1551,
+        "sigmaPx": 40.98,
+        "envelope": [
+          [
+            8.4,
+            0
+          ],
+          [
+            9.22,
+            0.0439
+          ],
+          [
+            10.03,
+            0.0889
+          ],
+          [
+            10.85,
+            0.1503
+          ],
+          [
+            11.67,
+            0.1424
+          ],
+          [
+            12.48,
+            0.0956
+          ],
+          [
+            13.3,
+            0
+          ]
+        ]
+      },
+      "logo-line-left": {
+        "visibleFromS": 2.8,
+        "visibleToS": 7.07,
+        "centreFromPx": -39.05,
+        "centreToPx": 425.09,
+        "peakOpacity": 0.0905,
+        "sigmaPx": 45.86,
+        "envelope": [
+          [
+            2.8,
+            0
+          ],
+          [
+            3.51,
+            0.0465
+          ],
+          [
+            4.22,
+            0.0745
+          ],
+          [
+            4.93,
+            0.0805
+          ],
+          [
+            5.64,
+            0.0635
+          ],
+          [
+            6.36,
+            0.0373
+          ],
+          [
+            7.07,
+            0
+          ]
+        ]
+      },
+      "logo-line-right": {
+        "visibleFromS": 6.83,
+        "visibleToS": 11.07,
+        "centreFromPx": 445.06,
+        "centreToPx": 928.89,
+        "peakOpacity": 0.0895,
+        "sigmaPx": 46.2,
+        "envelope": [
+          [
+            6.83,
+            0
+          ],
+          [
+            7.54,
+            0.0367
+          ],
+          [
+            8.24,
+            0.0609
+          ],
+          [
+            8.95,
+            0.081
+          ],
+          [
+            9.66,
+            0.0763
+          ],
+          [
+            10.36,
+            0.0478
+          ],
+          [
+            11.07,
+            0
+          ]
+        ]
+      }
+    },
+    "verification": "vs the Flowics videos: band centre within ~0-9px, peak opacity within 0.017, FWHM matches at 3 times per element"
+  },
+  "logoTreatment": {
+    "efnLogo": {
+      "source": "assets/logos/EFN_logo.svg (client asset; glyph bbox 124,88 752x324 in a 1000x500 viewBox)",
+      "fill": "#ebebeb",
+      "innerHighlight": "1px #ffffff on top/left edges",
+      "dropEdge": "hard black edge below, offset (0.3, 1), blur 0.3",
+      "innerShading": "slight darkening at the lower part of the E/F crossbars (#e1e1e1 -> #a4a4a4), not reproduced yet",
+      "svgFilter": "logoBevel in scripts/build-svgs.js",
+      "placement": {
+        "x": 917,
+        "y": 1031.5,
+        "w": 86,
+        "h": 37,
+        "in": "expandIn 600ms delay +300ms",
+        "out": "expandOut 300ms"
+      }
+    },
+    "logoBoxWordmark": {
+      "source": "assets/wordmarks/*.svg (supplied 2026-11-09)",
+      "fill": "#ebebeb (measured on air; files use #f2f2f2)",
+      "innerRim": "~0.6px light pink #ffe0e3 on bottom/right edges",
+      "svgFilter": "wordmarkInset in scripts/build-svgs.js",
+      "placement": "scale ~0.21 px per SVG unit, caps at y 16.75..55.7; per-variant fitted transform in element-registry.json",
+      "note": "a dark top/left edge (first guess) made edges darker than the source and was removed after scoring against the frames"
+    }
+  },
+  "typography": {
+    "family": "AkkuratStd (custom; woff 400, 400i, 700 in assets/fonts)",
+    "name": {
+      "weight": 700,
+      "size": 49,
+      "effectiveSize": 45,
+      "color": "rgb(240,240,240)",
+      "mode": "fitOneLine",
+      "x": "plate.x + 9",
+      "valign": "center"
+    },
+    "title": {
+      "weight": 700,
+      "size": 42,
+      "color": "rgb(26,26,26)",
+      "mode": "fitContainer max 80%",
+      "box": "hugs text: padding left 0.5em, right 0.8em, top 0.18em, bottom 0.22em"
+    },
+    "location": {
+      "weight": 700,
+      "size": 42,
+      "color": "rgb(240,240,240)",
+      "box": "same em padding as title, navy still image"
+    },
+    "textLine": {
+      "weight": 400,
+      "size": 46,
+      "color": "rgb(26,26,26)",
+      "letterSpacing": -0.04
+    },
+    "tickerShort": {
+      "weight": 700,
+      "size": 32,
+      "color": "rgb(26,26,26)",
+      "valign": "top",
+      "padX": "0.8em"
+    },
+    "tickerLong": {
+      "weight": 400,
+      "size": 18,
+      "color": "rgb(26,26,26)",
+      "valign": "bottom",
+      "padX": "1.5em",
+      "baseline": "item.bottom - 9"
+    },
+    "tickerValue": {
+      "weight": 700,
+      "size": 32,
+      "color": "#ffffff",
+      "align": "right",
+      "shadow": "0 2px 2px rgba(0,0,0,0.5)"
+    },
+    "clockDate": {
+      "weight": 700,
+      "size": 23,
+      "color": "rgb(235,235,235)",
+      "clock": "HH:mm Europe/Stockholm",
+      "date": "from data feed /Datum/0/Datum"
+    },
+    "slates": {
+      "label": "AkkuratStd 400 italic 42 white",
+      "name": "AkkuratStd 700 42 white (uppercase on Slutskylt)",
+      "startSlates": "Roboto 400/500 italic, rgb(229,229,229)"
+    }
+  },
+  "ticker": {
+    "columns": 4,
+    "columnWidth": "listWidth / 4",
+    "valueBox": {
+      "h": 34.7,
+      "yOffset": 6.7,
+      "shape": "middle",
+      "w": "800/142 * 34.7 = 195.5",
+      "xAlign": "97% within column",
+      "fade": "opacity 0 at 51.5% -> 1 at 100%, angle 99deg"
+    },
+    "valueColors": {
+      "up": "rgb(0,174,119)",
+      "down": "rgb(224,1,42)",
+      "neutral (prices, rates)": "rgb(175,165,134)"
+    },
+    "columnRamp": {
+      "color": "#e0d1ad",
+      "opacity": "0 at 46.4% -> 1 at 89.5%",
+      "shape": "columns 1-3: right-slanted, sharp corners; last column: straight right edge, right corners radius 2.6 (see element-registry ticker-column-ramp.lastColumn)",
+      "clip": "all column content is clipped to the ticker plate silhouette"
+    },
+    "paging": {
+      "pageSize": 1,
+      "items": 4,
+      "cycleSeconds": 6,
+      "itemIn": "slideLeftBigIn 500ms delay 700 stagger 50",
+      "itemOut": "slideRightBigOut 500ms stagger 50"
+    }
+  },
+  "data": {
+    "feed": "https://discover.flowics.com/discover/public/datasources/input/MpZ-9mQTQduqTlJbUVZ6jA/payload/content",
+    "pollSeconds": 5,
+    "groups": "pre, open, ... (arrays of 4-item pages)",
+    "rowFields": [
+      "Screen",
+      "symbol",
+      "Kort namn",
+      "Eget namn",
+      "Kurs",
+      "Enhet",
+      "Procent string",
+      "Color value",
+      "Flag"
+    ]
+  },
+  "animation": {
+    "engine": "GSAP keyframe pairs; full table in reference/flowics/animation-presets.json",
+    "slideLeftSolidIn": "x -100% -> 0 while clip-path inset(0 0 0 100%) -> inset(0) (content slides out from under its own left edge)",
+    "linearWipeRightIn": "clip-path inset(0 100% 0 0) -> inset(0)",
+    "linearWipeLeftOut": "clip-path inset(0) -> inset(0 100% 0 0)",
+    "slideLeftBigIn": "opacity 0, x -75px -> opacity 1, x 0",
+    "easings": [
+      "sine.in",
+      "linear",
+      "slow (GSAP SlowMo)"
+    ],
+    "nameStrap": {
+      "plate": "in slideLeftSolidIn 400ms @400 / out slideLeftSolidOut 400ms @470",
+      "name": "in linearWipeRightIn 400ms @550 / out linearWipeLeftOut 400ms @450",
+      "title": "in linearWipeRightIn 400ms @800 / out linearWipeLeftOut 450ms @0"
+    },
+    "logoBox": "in slideLeftSolidIn 500ms @0 / out slideLeftSolidOut 400ms @0 (BÖRSFRUKOST out @1000)",
+    "tickerPlate": "in slideLeftSolidIn 500ms @0 / out slideLeftSolidOut 400ms @0",
+    "tickerContent": "in slideLeftBigIn 360ms @400 / out linearWipeLeftOut 200ms",
+    "logoLine": "L/R plates slide in from their sides 600ms; EFN logo expandIn 300ms @600 (power1); back gradient fadeIn 900ms",
+    "textUpdate": "TEXT-LINE-* / ticker text on air: old text slideLeftSolidOut 500ms, new text slideRightSolidIn 500ms (sine.in)",
+    "credits": "Slutskylt rows slideLeftSolidIn 600ms (slow) staggered @600/1000/1400 (Nobel: 590/885/1250/1590); no out animation",
+    "startSlates": "overlay fadeIn ~405ms; ED_startskylt fadeOut 200ms, Börslunch start has no out",
+    "overlayTotalsMs": {
+      "name strap": [
+        1200,
+        870
+      ],
+      "logo box": [
+        500,
+        400
+      ],
+      "logo box BÖRSFRUKOST": [
+        500,
+        1400
+      ],
+      "text line": [
+        500,
+        400
+      ],
+      "ticker (data)": [
+        1200,
+        500
+      ],
+      "logo line": [
+        900,
+        600
+      ],
+      "location": [
+        400,
+        450
+      ]
+    }
+  },
+  "states": {
+    "model": "7 regions, each shows at most one overlay (single activeOverlayId); taking another overlay in the same region replaces it",
+    "notableExclusivity": "NAMNSKYLT lives in the LOGOBOX region -> name in the main row replaces the logo box",
+    "triggers": "no conditionals, no onTakeIn/onTakeOut events: sequencing is done by the operator via the remote controller (vizControlV2)",
+    "remoteControls": [
+      "Remote.Text on 38 text fields",
+      "Remote.List cycle interval on 8 ticker lists"
+    ],
+    "dataStates": [
+      "ticker page cycling (pageSize 1, interval 6s default)",
+      "value box colour up/down/neutral from feed",
+      "clock HH:mm",
+      "date from feed"
+    ]
+  },
+  "rendering": {
+    "recommended": "render at UHD (3840x2160, = the 2x source resolution) and downscale 2x2 to 1080p",
+    "why": "rims are 0.5px layers (one source pixel at 2x); native 1080p rendering also adds coloured sub-pixel fringes on text",
+    "previewSvg": "dist/preview/on-air-capture.svg has no fixed size: it fills whatever viewport renders it"
+  }
+}

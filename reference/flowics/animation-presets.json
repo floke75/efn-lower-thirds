@@ -1,0 +1,507 @@
+{
+ "fadeIn": [
+  {
+   "opacity": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector"
+  }
+ ],
+ "fadeOut": [
+  {
+   "opacity": "inspector",
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": 0
+  }
+ ],
+ "slideUpBigIn": [
+  {
+   "opacity": 0,
+   "y": 75,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector",
+   "y": 0,
+   "z": 0
+  }
+ ],
+ "slideUpBigOut": [
+  {
+   "opacity": "inspector",
+   "y": 0,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": 0,
+   "y": -75,
+   "z": 0
+  }
+ ],
+ "slideDownBigIn": [
+  {
+   "opacity": 0,
+   "y": -75,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector",
+   "y": 0,
+   "z": 0
+  }
+ ],
+ "slideDownBigOut": [
+  {
+   "opacity": "inspector",
+   "y": 0,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": 0,
+   "y": 75,
+   "z": 0
+  }
+ ],
+ "slideLeftBigIn": [
+  {
+   "opacity": 0,
+   "x": -75,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector",
+   "x": 0,
+   "z": 0
+  }
+ ],
+ "slideLeftBigOut": [
+  {
+   "opacity": "inspector",
+   "x": 0,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": 0,
+   "x": -75,
+   "z": 0
+  }
+ ],
+ "slideRightBigIn": [
+  {
+   "opacity": 0,
+   "x": 75,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector",
+   "x": 0,
+   "z": 0
+  }
+ ],
+ "slideRightBigOut": [
+  {
+   "opacity": "inspector",
+   "x": 0,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": 0,
+   "x": 75,
+   "z": 0
+  }
+ ],
+ "slideUpSolidIn": [
+  {
+   "y": "100%",
+   "clipPath": "inset(0% 0% 100% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "y": "0%",
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "slideUpSolidOut": [
+  {
+   "y": "0%",
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "y": "-100%",
+   "clipPath": "inset(100% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "slideDownSolidIn": [
+  {
+   "y": "-100%",
+   "clipPath": "inset(100% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "y": "0%",
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "slideDownSolidOut": [
+  {
+   "y": "0%",
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "y": "100%",
+   "clipPath": "inset(0% 0% 100% 0%)",
+   "z": 0
+  }
+ ],
+ "slideLeftSolidIn": [
+  {
+   "x": "-100%",
+   "clipPath": "inset(0% 0% 0% 100%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "x": "0%",
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "slideLeftSolidOut": [
+  {
+   "x": "0%",
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "x": "-100%",
+   "clipPath": "inset(0% 0% 0% 100%)",
+   "z": 0
+  }
+ ],
+ "slideRightSolidIn": [
+  {
+   "x": "100%",
+   "clipPath": "inset(0% 100% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "x": "0%",
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "slideRightSolidOut": [
+  {
+   "x": "0%",
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "x": "100%",
+   "clipPath": "inset(0% 100% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "linearWipeUpIn": [
+  {
+   "clipPath": "inset(100% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "linearWipeUpOut": [
+  {
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "inset(0% 0% 100% 0%)",
+   "z": 0
+  }
+ ],
+ "linearWipeDownIn": [
+  {
+   "clipPath": "inset(0% 0% 100% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "linearWipeDownOut": [
+  {
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "inset(100% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "linearWipeLeftIn": [
+  {
+   "clipPath": "inset(0% 0% 0% 100%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "linearWipeLeftOut": [
+  {
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "inset(0% 100% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "linearWipeRightIn": [
+  {
+   "clipPath": "inset(0% 100% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0
+  }
+ ],
+ "linearWipeRightOut": [
+  {
+   "clipPath": "inset(0% 0% 0% 0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "inset(0% 0% 0% 100%)",
+   "z": 0
+  }
+ ],
+ "irisWipeIn": [
+  {
+   "clipPath": "circle(0%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "circle(100%)",
+   "z": 0
+  }
+ ],
+ "irisWipeOut": [
+  {
+   "clipPath": "circle(100%)",
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "clipPath": "circle(0%)",
+   "z": 0
+  }
+ ],
+ "expandIn": [
+  {
+   "opacity": 0,
+   "scaleX": 0.625,
+   "scaleY": 0.625,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector",
+   "scaleX": 1,
+   "scaleY": 1,
+   "z": 0
+  }
+ ],
+ "expandOut": [
+  {
+   "opacity": "inspector",
+   "scaleX": 1,
+   "scaleY": 1,
+   "z": 0,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": 0,
+   "scaleX": 0.5,
+   "scaleY": 0.5,
+   "z": 0
+  }
+ ],
+ "flipXIn": [
+  {
+   "opacity": 0,
+   "rotateY": -55,
+   "transformPerspective": 800,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector",
+   "rotateY": 0,
+   "transformPerspective": 800
+  }
+ ],
+ "flipXOut": [
+  {
+   "opacity": "inspector",
+   "rotateY": 0,
+   "transformPerspective": 800,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": 0,
+   "rotateY": 55,
+   "transformPerspective": 800
+  }
+ ],
+ "flipYIn": [
+  {
+   "opacity": 0,
+   "rotateX": -45,
+   "transformPerspective": 800,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector",
+   "rotateX": 0,
+   "transformPerspective": 800
+  }
+ ],
+ "flipYOut": [
+  {
+   "opacity": "inspector",
+   "rotateX": 0,
+   "transformPerspective": 800,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": 0,
+   "rotateX": 25,
+   "transformPerspective": 800
+  }
+ ],
+ "bounceIn": [
+  {
+   "opacity": 0,
+   "scaleX": 0.3,
+   "scaleY": 0.3,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "opacity": "inspector",
+   "scaleX": 1.05,
+   "scaleY": 1.05,
+   "durationPercentage": 0.35
+  },
+  {
+   "scaleX": 0.9,
+   "scaleY": 0.9,
+   "z": 0,
+   "durationPercentage": 0.2
+  },
+  {
+   "scaleX": 1,
+   "scaleY": 1,
+   "durationPercentage": 0.45
+  }
+ ],
+ "bounceOut": [
+  {
+   "opacity": "inspector",
+   "scaleX": 1,
+   "scaleY": 1,
+   "duration": 0,
+   "delay": 0
+  },
+  {
+   "scaleX": 0.95,
+   "scaleY": 0.95,
+   "durationPercentage": 0.35
+  },
+  {
+   "scaleX": 1.1,
+   "scaleY": 1.1,
+   "z": 0,
+   "durationPercentage": 0.35
+  },
+  {
+   "opacity": 0,
+   "scaleX": 0.3,
+   "scaleY": 0.3,
+   "durationPercentage": 0.3
+  }
+ ],
+ "custom": []
+}
