@@ -1,0 +1,14 @@
+{
+  "//": "Type-checks the package's declarations against test/types.ts (npm run typecheck). Nothing is emitted.",
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": [],
+    "noUnusedLocals": false
+  },
+  "include": ["test/types.ts", "src/*.d.ts", "lib/*.d.ts"]
+}

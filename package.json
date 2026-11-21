@@ -34,7 +34,11 @@
   "scripts": {
     "build": "node scripts/build-assets.js && node scripts/build-svgs.js",
     "check": "node scripts/build-assets.js --check",
-    "demo": "node scripts/serve.js"
+    "demo": "node scripts/serve.js",
+    "typecheck": "tsc -p tsconfig.json && node scripts/check-exports.js"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=18"

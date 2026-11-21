@@ -6,7 +6,7 @@ The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordma
 
 ## Use it in an app
 
-The repository is an installable package: plain ES modules, no dependencies, no build step, with TypeScript declarations.
+The repository is an installable package: plain ES modules, no runtime dependencies, no build step, with TypeScript declarations (checked by `npm run typecheck`).
 
 ```bash
 npm install github:floke75/efn-lower-thirds#v0.2.0
@@ -77,7 +77,7 @@ Instead of npm you can add the repository as a git submodule and import `src/ind
 | `assets/logos/EFN_logo.svg` | EFN logo. |
 | `assets/wordmarks/` | Programme wordmarks supplied by EFN: Börslunch, Direkt, Morgon, Råvaror, Nobel. `manifest.json` keeps the original filenames. |
 
-Needs Node 18 or later for the scripts.
+Needs Node 18 or later for the scripts. Run `npm install` once for the TypeScript dev dependency.
 
 ## Working on the package
 
@@ -96,6 +96,14 @@ npm run check
 ```
 
 It fails if `src/assets.js` is out of date.
+
+After changing the API or the declarations:
+
+```bash
+npm run typecheck
+```
+
+It compiles `test/types.ts` against the TypeScript declarations, importing the package by name, and checks that every runtime export is declared and vice versa. TypeScript is a dev dependency only, so apps that install the package don't get it.
 
 To try changes live:
 
