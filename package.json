@@ -2,9 +2,11 @@
   "name": "efn-lower-thirds",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "EFN lower thirds as SVG for OGraf: plate geometry, rims, fills, glint, logos.",
   "scripts": {
-    "build": "node scripts/build-svgs.js"
+    "build": "node scripts/build-svgs.js",
+    "demo": "node scripts/serve.js"
   },
   "engines": {
     "node": ">=18"

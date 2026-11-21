@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EFN lower third: live renderer</title>
+<link rel="icon" href="data:,">
+<style>
+  @font-face { font-family: AkkuratStd; font-weight: 700; src: url('../assets/fonts/akkuratstd-700.woff') format('woff'); }
+  @font-face { font-family: AkkuratStd; font-weight: 400; src: url('../assets/fonts/akkuratstd-400.woff') format('woff'); }
+  @font-face { font-family: AkkuratStd; font-weight: 400; font-style: italic; src: url('../assets/fonts/akkuratstd-400i.woff') format('woff'); }
+  :root { color-scheme: dark; --ui: #1b1c1f; --line: #34363b; --text: #e6e6e6; --muted: #9a9ca3; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ui); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+  /* the stage is the 1920x1080 canvas; the fluid SVG fills it at any size */
+  #stage { position: relative; aspect-ratio: 16 / 9; width: 100%; border: 1px solid var(--line); overflow: hidden; }
+  #stage svg { position: absolute; inset: 0; display: block; }
+  #stage svg text { font-family: AkkuratStd, Arial, sans-serif; }
+  #stage.bg-grey { background: #333; }
+  #stage.bg-white { background: #fff; }
+  #stage.bg-checker { background: repeating-conic-gradient(#555 0% 25%, #444 0% 50%) 0 0 / 24px 24px; }
+  form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+  label { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
+  input, select { font: inherit; color: var(--text); background: #26282c; border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; }
+  label.check { display: flex; align-items: center; gap: 8px; color: var(--text); font-size: 14px; }
+  #readout { color: var(--muted); font: 12px/1.5 ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<main>
+  <div id="stage" class="bg-grey" aria-label="Lower third preview"></div>
+  <form id="controls" autocomplete="off">
+    <label>Name <input name="name" value="Namn Efternamn"></label>
+    <label>Title <input name="title" value="EFN"></label>
+    <label>Logo box <select name="logo"></select></label>
+    <label>Ticker page <select name="page"></select></label>
+    <label>Clock <input name="clock" value=""></label>
+    <label>Date <input name="date" value=""></label>
+    <label>Background
+      <select name="bg"><option value="grey">Dark grey</option><option value="white">White</option><option value="checker">Checker</option></select>
+    </label>
+    <label class="check"><input type="checkbox" name="responsive" checked> Size plates from the text</label>
+  </form>
+  <div id="readout"></div>
+</main>
+<script type="module" src="demo.js"></script>
+</body>
+</html>

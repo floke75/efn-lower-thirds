@@ -2,14 +2,17 @@
 
 EFN's on-air lower thirds, rebuilt as resolution-independent SVG for the [OGraf](https://github.com/ebu/ograf) standard. They replace the current Flowics graphic.
 
-The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordmarks) are replicated to pixel level against the Flowics original. The remaining work is turning them into the final OGraf graphics: responsive text fitting, animations, states and data.
+The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordmarks) are replicated to pixel level against the Flowics original. The renderer runs in the browser, so plates can be sized from their text at runtime. The remaining work is turning this into the final OGraf graphics: text fitting rules, animations, states and data.
 
 ## Contents
 
 | Path | What |
 |---|---|
+| `src/lower-third.js` | **The renderer.** An ES module with no file-system or DOM access, so it runs in the browser and in Node. It turns the registry into SVG markup: plates (fill, rims, glint, silhouette), the EFN logo, wordmarks and the full lower third. |
 | `lib/roundedSkewedCardPathUniform.js` | **Slant and corner-rounding tool.** Builds the SVG path of a plate with slanted sides and uniformly rounded corners at any width. |
-| `scripts/build-svgs.js` | Builds every plate and a full lower-third preview from the data below. Contains the renderer for rims (`rimRings`), fills, glint, logo filters and wordmark placement. |
+| `demo/` | Browser demo: the renderer running live, with name, title, logo box, ticker page, clock and date controls and text-driven plate sizing. |
+| `scripts/build-svgs.js` | Writes every plate and a full lower-third preview to `dist/` using the renderer. |
+| `scripts/serve.js` | Zero-dependency static server for the demo. |
 | `data/element-registry.json` | **Source of truth.** One entry per component (`name-plate`, `title-plate`, `logo-box` + 8 variants, `ticker-plate` + 6 variants, ticker column / value box / ramp, `location-plate`, logo line, …), with shape parameters, rims, fill, glint, text slots, layout rules and the Flowics graphics each one replaces. |
 | `data/design-tokens.json` | Shared values: shape, fills, rim model, typography, animation timings, states, data feed, rendering. |
 | `data/samples/ticker-payload.json` | Sample of the ticker data feed. |
@@ -19,9 +22,55 @@ The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordma
 | `assets/logos/EFN_logo.svg` | EFN logo. |
 | `assets/wordmarks/` | Programme wordmarks supplied by EFN: Börslunch, Direkt, Morgon, Råvaror, Nobel. `manifest.json` keeps the original filenames. |
 
-## Build
+Needs Node 18 or later. There are no dependencies and no bundler; the code is plain ES modules.
 
-Needs Node 18 or later; there are no dependencies.
+## Demo
+
+```bash
+npm run demo
+```
+
+Then open http://127.0.0.1:8765/demo/. To use another port, run `node scripts/serve.js 9000`.
+
+Type a name or title and the plates resize with the text, measured in the real AkkuratStd font. The title chains onto the name plate at the parallel slant, and the ticker re-chains after whichever logo box you pick. Untick "Size plates from the text" to see the fixed Flowics widths.
+
+## Using the renderer
+
+```js
+import { createRenderer } from './src/lower-third.js';
+
+// Load these however your runtime does: fetch() in a graphic, fs in Node.
+const r = createRenderer({
+  registry,        // data/element-registry.json
+  tokens,          // data/design-tokens.json
+  efnLogoSvg,      // text of assets/logos/EFN_logo.svg
+  wordmarks,       // { borslunch: '<svg…', direkt: '<svg…', … } from assets/wordmarks
+  idPrefix: 'lt-', // keeps SVG ids unique when several SVGs share one HTML document
+});
+
+// The full lower third as one fluid SVG document (fills its container at any resolution)
+const ctx = document.createElement('canvas').getContext('2d');
+const measureText = (text, { weight, sizePx }) => { ctx.font = `${weight} ${sizePx}px AkkuratStd`; return ctx.measureText(text).width; };
+el.innerHTML = r.composite(
+  { name: 'Namn Efternamn', title: 'EFN', logo: 'borslunch', page: tickerRows, clock: '16:24', date: '9 nov 2026' },
+  { measureText, fontsUrl: null },   // fontsUrl: null when the page already loads AkkuratStd
+);
+
+// Or a single plate at any width, for your own layout
+const defs = [];
+const markup = r.plate(r.comp('title-plate'), r.titleWidth(textWidth), x, y, { defs });
+const svg = r.svgDocument(1920, 1080, defs, markup, { fluid: true });
+```
+
+Other exports:
+- `elements()`: every plate at its Flowics size.
+- `namePlateWidth()` / `titleWidth()`: the sizing rules.
+- `efnLogo()`, `wordmark()`, `logoFilters`.
+- Geometry helpers: `geom()`, `shapePath()`, `cornerGeom()`, `slantOffset()`.
+
+The name plate's growth rule (`namePlateWidth`) is provisional; see the design spec.
+
+## Build static SVGs
 
 ```bash
 npm run build
@@ -38,14 +87,14 @@ To render the preview with your own content:
 node scripts/build-svgs.js --data my-content.json --name my-preview
 ```
 
-`my-content.json` is `{ "clock": "16:24", "date": "9 nov 2026", "page": [4 ticker rows] }`, with rows shaped like the ones in `data/samples/ticker-payload.json`.
+`my-content.json` takes the same `content` fields as `composite()`. Node has no text measurement, so the plates keep their Flowics widths there.
 
-The preview SVG has no fixed size. Render it at **3840×2160 and downscale to 1080p**: the rims are half-pixel layers at 1080p, so this matches the original best.
+Render SVGs at **3840×2160 and downscale to 1080p**: the rims are half-pixel layers at 1080p, so this matches the original best.
 
 ## The slant and rounding tool
 
 ```js
-const { roundedSkewedCardPathUniform } = require('./lib/roundedSkewedCardPathUniform.js');
+import { roundedSkewedCardPathUniform, cardCorners } from './lib/roundedSkewedCardPathUniform.js';
 
 // A name plate 640 px wide, with the registry's shape parameters
 const d = roundedSkewedCardPathUniform({
@@ -60,13 +109,13 @@ const d = roundedSkewedCardPathUniform({
   - `right`: last plate in a row (slanted left edge)
   - `none`: no slant
 - Neighbouring slanted edges stay parallel at any width.
-- To match the original exactly, place the shape inside the component box with the registry's `insetTop`, `slantOutsetPx` and `straightInsetPx` (see `geom()` in `scripts/build-svgs.js`).
+- To match the original exactly, place the shape inside the component box with the registry's `insetTop`, `slantOutsetPx` and `straightInsetPx` (`geom()` / `shapePath()` in `src/lower-third.js` do this).
 - `cardCorners()` returns the four corner points.
 
 ## Next steps
 
-- **Runtime plate builder:** `scripts/build-svgs.js` runs in Node and reads files from disk. Responsive OGraf graphics size their plates from the text at runtime, so its shape, rim, fill and glint functions need to move into a browser module.
-- **Text fitting:** name and title fitting rules, and the chaining rule (each plate starts 4.5 px into the previous box). See the design spec.
+- **OGraf packaging:** wrap `createRenderer` in the OGraf graphic web component, with its manifest, data schema, and load / update / play / stop.
+- **Text fitting:** decide the final name-plate rule (grow with the text, as in the demo, or shrink the text as Flowics does). See the design spec.
 - **Animations and states:** from `reference/flowics/` and the `animation` and `states` tokens.
 - **Missing wordmarks:** BÖRSFRUKOST, MARKNAD and UPDATE haven't been supplied, so those logo boxes are plate-only.
 - **Glint timing:** start each plate's 15 s glint loop when the plate is taken in.

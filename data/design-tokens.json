@@ -70,7 +70,7 @@
   },
   "bevel": {
     "model": "directional rim, lit from the upper left (~117 deg): per-edge layer colours + per-angle colours around each rounded corner + variation along each edge (element-registry.json components[].bevel: top/right/bottom/left, corners, along)",
-    "renderer": "scripts/build-svgs.js rimRings(): each layer is a continuous even-thickness ring (outer bleed minus concentric inset), deepest first; straight zones = edge colour + measured variation, corners = gradients on the measured per-angle colours, mapped on each ring's radius",
+    "renderer": "src/lower-third.js rimRings(): each layer is a continuous even-thickness ring (outer bleed minus concentric inset), deepest first; straight zones = edge colour + measured variation, corners = gradients on the measured per-angle colours, mapped on each ring's radius",
     "verification": "edge pixels median RGB distance 1.4 vs the Flowics source; corner rim light mean |diff| 9-21 on a 150-430 range"
   },
   "fills": {
@@ -397,7 +397,7 @@
       "innerHighlight": "1px #ffffff on top/left edges",
       "dropEdge": "hard black edge below, offset (0.3, 1), blur 0.3",
       "innerShading": "slight darkening at the lower part of the E/F crossbars (#e1e1e1 -> #a4a4a4), not reproduced yet",
-      "svgFilter": "logoBevel in scripts/build-svgs.js",
+      "svgFilter": "logoBevel in src/lower-third.js",
       "placement": {
         "x": 917,
         "y": 1031.5,
@@ -411,7 +411,7 @@
       "source": "assets/wordmarks/*.svg (supplied 2026-11-09)",
       "fill": "#ebebeb (measured on air; files use #f2f2f2)",
       "innerRim": "~0.6px light pink #ffe0e3 on bottom/right edges",
-      "svgFilter": "wordmarkInset in scripts/build-svgs.js",
+      "svgFilter": "wordmarkInset in src/lower-third.js",
       "placement": "scale ~0.21 px per SVG unit, caps at y 16.75..55.7; per-variant fitted transform in element-registry.json",
       "note": "a dark top/left edge (first guess) made edges darker than the source and was removed after scoring against the frames"
     }

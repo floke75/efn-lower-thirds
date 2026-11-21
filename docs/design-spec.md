@@ -43,7 +43,7 @@ Every plate is one shape from `lib/roundedSkewedCardPathUniform.js`:
   - `shape.insetTop` and `shape.height` give the visible plate inside `boxHeight` (71 for most plates).
   - `shape.slantOutsetPx`: slanted edges sit 0.35–0.8 px *outside* the box.
   - `shape.straightInsetPx`: straight edges sit about 0.3 px *inside* it.
-  - `geom()` in `scripts/build-svgs.js` applies all three.
+  - `geom()` in `src/lower-third.js` applies all three.
 
 ## Rims (bevel)
 
@@ -120,12 +120,14 @@ Font: AkkuratStd 400 / 400i / 700 (`assets/fonts`).
 | text line | 400 / 46, letter-spacing −0.04 | `rgb(26,26,26)` | |
 | clock / date | 700 / 23 | | on the logo line halves |
 
-Flowics uses fixed-width plates: the name plate is always 588.5 px, and there are 15 fixed ticker overlays, one per logo box width. The SVG build is meant to be **fully responsive**:
+Flowics uses fixed-width plates: the name plate is always 588.5 px, and there are 15 fixed ticker overlays, one per logo box width. The SVG build is **fully responsive** (`composite()` with a `measureText` hook, see the demo):
 - Measure the text in the renderer and size each plate from it.
 - Draw every plate with `roundedSkewedCardPathUniform`.
 - Chain each plate 4.5 px into the previous box.
 
 One ticker component then replaces all the fixed-width variants.
+
+The name-plate rule in `namePlateWidth()` is **provisional**: at least 588.5 px, growing with the text (0.15em padding each side plus the slanted edge's run). The final fitting rule is still open.
 
 ## Animation and states (to implement)
 
