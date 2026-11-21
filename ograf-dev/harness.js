@@ -4,19 +4,25 @@
 // URL options: ?manifest=<url>  &bg=grey|white|checker|none  &autoplay=1 (play with skipAnimation after load)
 import { runConformance, tagFor } from './conformance.js';
 
+// test: data the conformance checks use on top of the manifest defaults (the ticker reads the repo's sample feed,
+// so the checks don't depend on live market data). update: the sample updateAction in the non-real-time schedule.
+const SAMPLE_FEED = { feed: '/data/samples/ticker-payload.json' };
 const GRAPHICS = [
-  ['Name strap (source)', '../ograf/efn-name-strap.ograf.json'],
-  ['Name strap (built, dist/ograf)', '../dist/ograf/efn-lower-thirds/efn-name-strap.ograf.json'],
+  { label: 'Name strap (source)', url: '../ograf/efn-name-strap.ograf.json', update: { title: 'Ny titel efter uppdatering' } },
+  { label: 'Name strap (built, dist/ograf)', url: '../dist/ograf/efn-lower-thirds/efn-name-strap.ograf.json', update: { title: 'Ny titel efter uppdatering' } },
+  { label: 'Logo box + ticker (source)', url: '../ograf/efn-ticker.ograf.json', test: SAMPLE_FEED, update: { group: 'pre' } },
+  { label: 'Logo box + ticker (built, dist/ograf)', url: '../dist/ograf/efn-lower-thirds/efn-ticker.ograf.json', test: SAMPLE_FEED, update: { group: 'pre' } },
 ];
+const entry = () => GRAPHICS.find(g => g.url === $('manifest').value) || {};
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const stage = $('stage'), log = $('log');
 let manifest, manifestHref, graphic;
 
-for (const [label, url] of GRAPHICS) $('manifest').add(new Option(label, url));
+for (const g of GRAPHICS) $('manifest').add(new Option(g.label, g.url));
 const wanted = params.get('manifest');
-if (wanted && !GRAPHICS.some(([, u]) => u === wanted)) $('manifest').add(new Option(wanted, wanted));
-$('manifest').value = wanted || GRAPHICS[0][1];
+if (wanted && !GRAPHICS.some(g => g.url === wanted)) $('manifest').add(new Option(wanted, wanted));
+$('manifest').value = wanted || GRAPHICS[0].url;
 $('bg').value = params.get('bg') || 'grey';
 stage.className = `bg-${$('bg').value}`;
 
@@ -33,14 +39,26 @@ function buildForm() {
     label.textContent = p.label || p.title || key;
     let input;
     if (p.enum) { input = document.createElement('select'); for (const v of p.enum) input.add(new Option(p.gddOptions?.labels?.[v] ?? v, v)); }
-    else { input = document.createElement('input'); if (p.maxLength) input.maxLength = p.maxLength; }
+    else if (p.type === 'array' || p.type === 'object') { input = document.createElement('textarea'); input.placeholder = 'JSON'; }
+    else { input = document.createElement('input'); if (p.type === 'number' || p.type === 'integer') { input.type = 'number'; if ('minimum' in p) input.min = p.minimum; if ('maximum' in p) input.max = p.maximum; } if (p.maxLength) input.maxLength = p.maxLength; }
     input.name = key;
-    input.value = p.default ?? '';
+    input.dataset.type = p.type;
+    input.value = p.type === 'array' || p.type === 'object' ? JSON.stringify(p.default ?? (p.type === 'array' ? [] : {})) : (p.default ?? '');
     label.append(input);
     form.append(label);
   }
 }
-const formData = () => Object.fromEntries([...$('data').elements].filter(e => e.name).map(e => [e.name, e.value]));
+const parseField = (e) => {
+  if (e.dataset.type === 'number' || e.dataset.type === 'integer') return Number(e.value);
+  if (e.dataset.type === 'array' || e.dataset.type === 'object') { try { return JSON.parse(e.value || 'null') ?? (e.dataset.type === 'array' ? [] : {}); } catch { write('form', `${e.name}: not valid JSON, sending it as text`); return e.value; } }
+  return e.value;
+};
+const formData = () => Object.fromEntries([...$('data').elements].filter(e => e.name).map(e => [e.name, parseField(e)]));
+const sampleSchedule = () => JSON.stringify([
+  { timestamp: 200, action: { type: 'playAction', params: { goto: 0 } } },
+  { timestamp: 3000, action: { type: 'updateAction', params: { data: entry().update || {} } } },
+  { timestamp: 5500, action: { type: 'stopAction', params: {} } },
+], null, 1);
 
 async function mount(renderType = 'realtime') {
   if (graphic) { await call('dispose', {}); graphic.remove(); }
@@ -50,16 +68,10 @@ async function mount(renderType = 'realtime') {
   const tag = tagFor(Graphic, 'efn-dev-graphic');
   graphic = document.createElement(tag);
   stage.append(graphic);
-  if (!$('data').childElementCount || $('data').dataset.manifest !== manifestHref) { buildForm(); $('data').dataset.manifest = manifestHref; }
+  if (!$('data').childElementCount || $('data').dataset.manifest !== manifestHref) { buildForm(); $('data').dataset.manifest = manifestHref; $('schedule').value = sampleSchedule(); }
   const { width, height } = stage.getBoundingClientRect();
   await call('load', { data: formData(), renderType, renderCharacteristics: { resolution: { width: Math.round(width), height: Math.round(height) }, frameRate: 50 } });
 }
-
-$('schedule').value = JSON.stringify([
-  { timestamp: 200, action: { type: 'playAction', params: { goto: 0 } } },
-  { timestamp: 3000, action: { type: 'updateAction', params: { data: { title: 'Ny titel efter uppdatering' } } } },
-  { timestamp: 5500, action: { type: 'stopAction', params: {} } },
-], null, 1);
 
 $('play').onclick = () => call('playAction', { goto: 0, skipAnimation: $('skip').checked });
 $('next').onclick = () => call('playAction', { delta: 1, skipAnimation: $('skip').checked });
@@ -79,7 +91,7 @@ $('time').oninput = async () => {
 };
 $('conform').onclick = async () => {
   $('results').textContent = 'running…';
-  const results = await runConformance(manifestHref);
+  const results = await runConformance(manifestHref, { data: entry().test });
   const failed = results.filter(r => !r.pass);
   $('summary').textContent = `${results.length - failed.length}/${results.length} passed`;
   $('results').innerHTML = results.map(r => `<span class="${r.pass ? 'pass' : 'fail'}">${r.pass ? 'PASS' : 'FAIL'}</span>  ${r.name}${r.detail ? `  <span>(${r.detail.replace(/</g, '&lt;')})</span>` : ''}`).join('\n');

@@ -1,0 +1,124 @@
+{
+  "$schema": "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
+  "id": "efn-ticker",
+  "version": "0.4.0",
+  "name": "EFN Logo box + ticker",
+  "description": "The programme's red logo box and, beside it, the beige ticker plate with market values from the EFN ticker feed, 4 per page, turning every few seconds. The ticker starts where the logo box ends. Replaces the Flowics overlays LOGOBOX-* and TICKER-LINE-* PRE / OPEN.",
+  "author": {
+    "name": "EFN",
+    "url": "https://www.efn.se"
+  },
+  "main": "efn-ticker.mjs",
+  "supportsRealTime": true,
+  "supportsNonRealTime": true,
+  "stepCount": 1,
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "logo": {
+        "type": "string",
+        "title": "Logo box",
+        "label": "Logo box",
+        "description": "Programme logo box. BÖRSFRUKOST, MARKNAD and UPDATE show the plate only until their wordmarks are supplied.",
+        "enum": ["borsfrukost", "borslunch", "marknad", "ravaror", "morgon", "direkt", "update", "nobel"],
+        "gddType": "select",
+        "gddOptions": {
+          "labels": {
+            "borsfrukost": "BÖRSFRUKOST",
+            "borslunch": "BÖRSLUNCH",
+            "marknad": "MARKNAD",
+            "ravaror": "RÅVAROR",
+            "morgon": "MORGON",
+            "direkt": "DIREKT",
+            "update": "UPDATE",
+            "nobel": "NOBEL"
+          }
+        },
+        "order": 1,
+        "default": "borslunch"
+      },
+      "group": {
+        "type": "string",
+        "title": "Ticker values",
+        "label": "Ticker values",
+        "description": "Which list of the ticker feed to show.",
+        "enum": ["open", "pre"],
+        "gddType": "select",
+        "gddOptions": {
+          "labels": {
+            "open": "Open market (open)",
+            "pre": "Pre-market (pre)"
+          }
+        },
+        "order": 2,
+        "default": "open"
+      },
+      "interval": {
+        "type": "integer",
+        "title": "Time per page",
+        "label": "Time per page",
+        "description": "How long each page of 4 values stays before the next one, in milliseconds (Flowics default 6 s).",
+        "gddType": "duration-ms",
+        "minimum": 2000,
+        "maximum": 60000,
+        "order": 3,
+        "default": 6000
+      },
+      "feed": {
+        "type": "string",
+        "title": "Ticker feed URL",
+        "label": "Ticker feed URL",
+        "description": "URL of a Flowics JSON datasource with the lists `open` and `pre` (pages of 4 rows). Empty: the EFN ticker feed.",
+        "gddType": "single-line",
+        "order": 4,
+        "default": "",
+        "hidden": true
+      },
+      "pages": {
+        "type": "array",
+        "title": "Pages",
+        "label": "Pages (instead of the feed)",
+        "description": "Ticker pages to show instead of the feed: a list of pages, each a list of up to 4 rows as the feed delivers them. Empty: use the feed.",
+        "items": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "properties": {
+              "Kort namn": { "type": "string", "label": "Short name" },
+              "Eget namn": { "type": "string", "label": "Long name" },
+              "Procent string": { "type": "string", "label": "Value" },
+              "Color value": { "type": "string", "label": "Value box colour" }
+            }
+          }
+        },
+        "order": 5,
+        "default": [],
+        "hidden": true
+      }
+    }
+  },
+  "actionDurations": [
+    { "type": "playAction", "duration": 1200 },
+    { "type": "updateAction", "duration": 0 },
+    { "type": "stopAction", "duration": 500 }
+  ],
+  "renderRequirements": [
+    {
+      "resolution": {
+        "width": { "ideal": 1920 },
+        "height": { "ideal": 1080 }
+      },
+      "frameRate": { "ideal": 50 }
+    }
+  ],
+  "thumbnails": [
+    { "file": "thumbnails/efn-ticker.png", "resolution": { "width": 1280, "height": 720 } }
+  ],
+  "v_efn": {
+    "flowicsOverlays": ["LOGOBOX-*", "TICKER-LINE-* PRE", "TICKER-LINE-* OPEN"],
+    "feed": "Polled every 5 s in real-time rendering, fetched once in load() in non-real-time rendering. The feed host must allow cross-origin requests (the Flowics datasource sends Access-Control-Allow-Origin: *).",
+    "canvas": "Designed on a 1920x1080 canvas; scales to any 16:9 output. Render UHD for the sharpest rims."
+  }
+}

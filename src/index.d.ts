@@ -107,6 +107,24 @@ export interface NameStrap {
   };
 }
 
+export interface LogoTicker {
+  logoPlate: string;
+  /** '' when no wordmark was supplied for the variant */
+  wordmark: string;
+  tickerPlate: string;
+  /** id of a clipPath (pushed to defs) with the ticker plate's silhouette; clip the pages with it */
+  tickerClip: string;
+  /** markup per page: 4 column ramps plus each row's value box and texts */
+  pages: string[];
+  layout: {
+    y: number;
+    logo: { x: number; w: number; variant: string };
+    /** ticker plate box: starts 4.5 px before the logo box ends, runs to the safe right edge */
+    ticker: { x: number; w: number };
+    list: { x: number; y: number; w: number; h: number; colW: number };
+  };
+}
+
 export interface RendererOptions {
   registry: Registry;
   tokens: Tokens;
@@ -134,6 +152,8 @@ export interface Renderer {
   namePlateWidth(textWidth: number): number;
   /** Name plate + title plate on one row, as separate parts (for animating them). */
   nameStrap(content?: { name?: string; title?: string }, options?: NameStrapOptions): NameStrap;
+  /** Logo box + ticker plate on the main row, with the ticker pages, as separate parts (for animating them). */
+  logoTicker(content?: { logo?: string; pages?: TickerRow[][] }, options?: { defs: string[] }): LogoTicker;
   /** The full lower third as one SVG document. */
   composite(content?: Content, options?: CompositeOptions): string;
   /** Every plate at its Flowics size, without text. */

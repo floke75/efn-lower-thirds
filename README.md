@@ -2,17 +2,18 @@
 
 EFN's on-air lower thirds, rebuilt as resolution-independent SVG for the [OGraf](https://github.com/ebu/ograf) standard. They replace the current Flowics graphic.
 
-The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordmarks) are replicated to pixel level against the Flowics original. The package renders them in any browser or in Node, sized from their text at runtime. The OGraf graphics are built on top of that, starting with the name strap.
+The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordmarks) are replicated to pixel level against the Flowics original. The package renders them in any browser or in Node, sized from their text at runtime. The OGraf graphics are built on top of that: so far the name strap and the logo box + ticker.
 
 ## OGraf graphics
 
 | Graphic | Manifest | Replaces (Flowics) |
 |---|---|---|
 | Name strap: name plate + title plate | `ograf/efn-name-strap.ograf.json` | NAMN1, NAMN2, NAMNSKYLT-EGEN-RAD, NAMNSKYLT |
+| Logo box + ticker: programme logo box and the market ticker beside it | `ograf/efn-ticker.ograf.json` | LOGOBOX-\*, TICKER-LINE-\* PRE / OPEN |
 
 **Building and delivering:** `npm run build` writes `dist/ograf/efn-lower-thirds/` and `dist/efn-lower-thirds-ograf-<version>.zip`. Load that folder or zip into an OGraf renderer or server.
 
-- **Self-contained:** the manifests, the graphic modules, a private copy of the renderer and the fonts. Every reference is relative, and nothing is fetched from the network.
+- **Self-contained:** the manifests, the graphic modules, a private copy of the renderer and the fonts. Every reference is relative. The only network request is the ticker's data feed (see below).
 - **Validated:** each manifest is checked against the official OGraf v1 JSON schemas, vendored in `reference/ograf/`.
 
 **Serving requirements:**
@@ -38,6 +39,29 @@ The plates (shape, slant, corner rounding, rims, gradients, glint, logos, wordma
 
 Updates apply instantly; Flowics had no update animation here either.
 
+**Logo box + ticker:** one graphic, because the ticker starts where the logo box ends (4.5 px into it) and separate OGraf graphics can't see each other's size. It replaces the 8 logo-box overlays and the 15 fixed-width ticker overlays.
+
+| Field | Description |
+|---|---|
+| `logo` | Logo box: BÖRSFRUKOST, BÖRSLUNCH (default), MARKNAD, RÅVAROR, MORGON, DIREKT, UPDATE, NOBEL. BÖRSFRUKOST, MARKNAD and UPDATE are plate-only until their wordmarks are supplied. |
+| `group` | Which list of the feed to show: `open` (default) or `pre`. |
+| `interval` | Time per page in ms (`duration-ms`, default 6000, 2000–60000). |
+| `feed` | Feed URL. Empty (default) is the EFN ticker feed. Hidden. |
+| `pages` | Pages to show instead of the feed: `[[row × up to 4], …]`, rows as the feed has them (`Kort namn`, `Eget namn`, `Procent string`, `Color value`). Also accepted as JSON text. Hidden. |
+
+- **Data:** the graphic fetches the feed in `load()`. In real time it then polls every 5 s, and new values replace the text in place, as Flowics' bindings do. In non-real-time it fetches once, so a render is repeatable. If the feed can't be reached, the plates still show and the columns stay empty until data arrives; the last good data is kept during an outage.
+- **Pages:** 4 values a page. Each take-in starts at the first page; then a page turns every `interval`. Changing the interval or the number of pages restarts that timer, and if the current page no longer exists the ticker goes back to the first. This is Flowics' list logic (read from its player code), and it is a pure function of time, so non-real-time renders show the same page as live playout.
+
+**Logo box + ticker animations** (Flowics timings; GSAP `slow` is SlowMo):
+
+| | Logo box and ticker plate | Columns | Page | Total |
+|---|---|---|---|---|
+| In | slide out from under their left edges, 0–500 ms | slide in from 75 px left and fade in, 400–760 ms (`slow`) | slides in from 75 px left and fades in, 700–1200 ms | 1200 ms |
+| Out | slide back, 0–400 ms | wipe out right to left, 0–200 ms | slides 75 px right and fades, 0–500 ms | 500 ms |
+| Page turn | | | old page out 0–500 ms, new page in 700–1200 ms | |
+
+Not reproduced: Flowics delays the BÖRSFRUKOST logo box's take-out by 1 s (only that variant). Changing `logo` or `group` while on air switches instantly; in Flowics that would be taking a different overlay.
+
 **What the graphics implement (OGraf v1, spec as of Oct 2026):**
 - **Real-time and non-real-time.** `goToTime()` and `setActionsSchedule()` give frame-exact renders; a frame at time T matches the live output at T.
 - **Steps.** `stepCount` 1, with the exact step rules and a `currentStep` in every `playAction` result.
@@ -54,7 +78,7 @@ Updates apply instantly; Flowics had no update animation here either.
 - play / next / stop / update, with `skipAnimation`;
 - a data form generated from the manifest schema;
 - a non-real-time scrubber driven by a schedule you can edit;
-- **Run OGraf conformance checks**: 28 checks, covering the normative parts of the spec plus the EBU's own example tests.
+- **Run OGraf conformance checks**: 28 checks, covering the normative parts of the spec plus the EBU's own example tests. The ticker is checked against the sample feed in `data/samples/`, so the result doesn't depend on live market data.
 
 Also in `ograf-dev/`:
 - `frame.html` renders one frame of a graphic, full viewport (used for thumbnails).
@@ -65,7 +89,7 @@ Also in `ograf-dev/`:
 The repository is an installable package: plain ES modules, no runtime dependencies, no build step, with TypeScript declarations (checked by `npm run typecheck`).
 
 ```bash
-npm install github:floke75/efn-lower-thirds#v0.3.0
+npm install github:floke75/efn-lower-thirds#v0.4.0
 ```
 
 The repository is private, so the machine running the install needs GitHub access to it (for example, signed in with `gh auth login`). Pin a tag, and bump it to take an update.
@@ -209,10 +233,9 @@ const d = roundedSkewedCardPathUniform({
 
 ## Next steps
 
-- **More OGraf graphics** on the same base class: logo box + ticker (with paging), logo line (clock, date), location bar, text line.
+- **More OGraf graphics** on the same base class: logo line (clock, date), location bar, text line (the text-line overlays sit beside the logo box like the ticker, so it could become a mode of the ticker graphic).
 - **Try the package in the target renderer(s)** and adjust `renderRequirements` if they need it.
 - **Text fitting:** decide the final name-plate rule (grow with the text, as in the demo, or shrink the text as Flowics does). See the design spec.
-- **Animations and states:** from `reference/flowics/` and the `animation` and `states` tokens.
 - **Missing wordmarks:** BÖRSFRUKOST, MARKNAD and UPDATE haven't been supplied, so those logo boxes are plate-only.
 
 ## Provenance

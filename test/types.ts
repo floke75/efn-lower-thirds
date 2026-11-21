@@ -7,7 +7,7 @@ import {
   registry, tokens, efnLogoSvg, wordmarks, sampleTickerPayload,
   geom, shapePath, slantOffset, cornerGeom, f2, esc,
   roundedSkewedCardPathUniform, cardCorners,
-  type Renderer, type NameStrap, type Content, type MeasureText, type Shape, type TickerRow, type Component, type LogoBoxVariant,
+  type Renderer, type NameStrap, type LogoTicker, type Content, type MeasureText, type Shape, type TickerRow, type Component, type LogoBoxVariant,
 } from 'efn-lower-thirds';
 import { createRenderer as createRendererOnly, type RendererOptions } from 'efn-lower-thirds/renderer';
 import { roundedSkewedCardPathUniform as pathOnly, cardCorners as cornersOnly, type CardPosition } from 'efn-lower-thirds/geometry';
@@ -37,6 +37,12 @@ const strapMarkup: string = strap.namePlate + strap.nameText + strap.titlePlate 
 const titleWipe: number | undefined = strap.layout.title?.elementW;
 // @ts-expect-error row is 'own' or 'main'
 lt.nameStrap({ name: 'x' }, { row: 'side' });
+const tickerDefs: string[] = [];
+const lbt: LogoTicker = lt.logoTicker({ logo: 'borslunch', pages: [sampleTickerPayload.data.open[0]] }, { defs: tickerDefs });
+const tickerMarkup: string = lbt.logoPlate + lbt.wordmark + lbt.tickerPlate + `<g clip-path="url(#${lbt.tickerClip})">${lbt.pages.join('')}</g>`;
+const colW: number = lbt.layout.list.colW;
+// @ts-expect-error logoTicker() needs the defs array
+lt.logoTicker({ logo: 'borslunch' }, {});
 const variant = (registry.components.find(c => c.id === 'logo-box')?.variants ?? [])[0] as LogoBoxVariant;
 const wm: string = lt.wordmark(variant, 11, 956.01);
 const logo: string = lt.efnLogo(917, 1031.5, 86, 37);

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
   "id": "efn-name-strap",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "name": "EFN Name strap",
   "description": "Navy name plate with the person's name and a beige title plate on the same row. Both plates size to their text. Shown on its own row above the main row, or in the main row in place of the logo box. Replaces the Flowics overlays NAMN1, NAMN2, NAMNSKYLT-EGEN-RAD and NAMNSKYLT.",
   "author": {

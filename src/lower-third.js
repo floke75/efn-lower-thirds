@@ -26,6 +26,7 @@ const allMatches = (s, re) => { const out = []; let m; re.lastIndex = 0; while (
 
 export const f2 = (n) => +(+n).toFixed(2);
 export const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escAttr = (t) => esc(t).replace(/"/g, '&quot;');   // for values inside "..." attributes
 
 const EDGES = ['top', 'right', 'bottom', 'left'];
 const CORNERS = ['TL', 'TR', 'BR', 'BL'];
@@ -364,6 +365,67 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
     return out;
   }
 
+  // ---------- logo box + ticker on the main row ----------
+  // Returns the parts separately so a graphic can animate them, plus the layout it used:
+  //   { logoPlate, wordmark, tickerPlate, tickerClip, pages, layout }
+  // content: { logo (logo-box variant id), pages: [[row, row, row, row], ...] } (rows as in the feed, see
+  //          sampleTickerPayload). pages[i] is the markup of page i: 4 column ramps plus each row's value box and
+  //          texts, as Flowics' list item holds them. options: defs (receives the parts' <defs> entries).
+  // The ticker starts 4.5 px before the logo box ends and runs to the safe right edge. tickerClip is the id of a
+  // clipPath (pushed to defs) with the ticker plate's silhouette: Flowics clips all column content to it.
+  // Column geometry (ramps, value-box fades) is the same on every page, so its defs are made once.
+  function logoTicker(content = {}, { defs } = {}) {
+    const rows = REG.rows, lb = comp('logo-box'), y = rows.mainRow.y;
+    const logoId = def(content.logo, 'borslunch'), pages = def(content.pages, []);
+    const v = lb.variants.find(x => x.id === logoId);
+    if (!v) throw new Error(`unknown logo-box variant "${logoId}"`);
+    const lx = lb.layout.x, lw = v.flowicsSize.w;
+    const out = {};
+    out.logoPlate = plate(lb, lw, lx, y, Object.assign({ defs }, v.fill ? { fill: v.fill } : {}, v.bevel ? { bevel: v.bevel } : {}));
+    out.wordmark = wordmark(v, lx, y);
+    if (out.wordmark && defs.indexOf(logoFilters) < 0) defs.push(logoFilters);   // the wordmark's inset filter
+    const tk = comp('ticker-plate');
+    const tx = lx + lw - REG.adjacentPlateOverlapPx;   // = 341.5 in Flowics (BÖRSLUNCH)
+    const tw = rows.safeRight - tx;
+    out.tickerPlate = plate(tk, tw, tx, y, { defs });
+    const col = comp('ticker-column'), vb = comp('ticker-value-box'), ramp = comp('ticker-column-ramp'), ts = col.text;
+    const listX = tx + col.layout.listInsetFromPlate.x, listY = y + col.layout.listInsetFromPlate.y, listW = rows.safeRight - listX, listH = col.layout.listHeight;
+    const colW = listW / 4;
+    defs.push(`<linearGradient id="${id('rampg')}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${ramp.fill.color}" stop-opacity="0"/><stop offset="1" stop-color="${ramp.fill.color}" stop-opacity="1"/></linearGradient>`,
+      `<filter id="${id('vshadow')}" x="-5%" y="-20%" width="110%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="1" flood-color="#000" flood-opacity="0.5"/></filter>`);
+    // Flowics masks the whole list with the ticker's hard mask: nothing in the columns paints outside the plate.
+    out.tickerClip = nid('tclip');
+    defs.push(`<clipPath id="${out.tickerClip}"><path d="${shapePath(tk.shape, tw, tx, y)}"/></clipPath>`);
+    const columns = pages.length ? [0, 1, 2, 3].map((i) => {
+      const cx = listX + i * colW;
+      // ramp: 235 wide, right-anchored in a rect that starts 2px below the list top; gradient 46.4%..89.5% of the column
+      const rx = cx + colW - ramp.size.w, ry = listY + 2;
+      const g0 = (cx + colW * 0.464 - rx) / ramp.size.w, g1 = (cx + colW * 0.895 - rx) / ramp.size.w;
+      const gid = nid('rg'); defs.push(`<linearGradient id="${gid}" x1="${f2(Math.max(0, g0))}" y1="0" x2="${f2(g1)}" y2="0"><stop offset="0" stop-color="${ramp.fill.color}" stop-opacity="0"/><stop offset="1" stop-color="${ramp.fill.color}" stop-opacity="1"/></linearGradient>`);
+      // last column: straight right edge with rounded right corners instead of the slanted ramp
+      const rs = i === 3 ? ramp.lastColumn.shape : ramp.shape;
+      // value box: 195.5 x 34.7 at 97% of the free space, faded in from the left of the column
+      const bx = cx + (colW - vb.size.w) * 0.97, by = listY + vb.layout.yOffsetInColumn;
+      const mid = nid('vm'), fid = nid('vf');
+      const s0 = (cx + colW * 0.515 - bx) / vb.size.w;
+      defs.push(`<linearGradient id="${fid}" x1="0" y1="0" x2="1" y2="0"><stop offset="${f2(Math.max(0, s0))}" stop-color="#fff" stop-opacity="${s0 < 0 ? f2(-s0 / (1 - s0)) : 0}"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient>`,
+        `<mask id="${mid}" maskUnits="userSpaceOnUse" x="${f2(bx)}" y="${f2(by)}" width="${vb.size.w}" height="${vb.size.h}"><rect x="${f2(bx)}" y="${f2(by)}" width="${vb.size.w}" height="${vb.size.h}" fill="url(#${fid})"/></mask>`);
+      return { cx, ramp: `<path data-component="ticker-column-ramp" d="${shapePath(rs, ramp.size.w, rx, ry)}" fill="url(#${gid})"/>`, boxPath: shapePath(vb.shape, vb.size.w, bx, by), mask: mid };
+    }) : [];
+    out.pages = pages.map((page) => columns.map((c, i) => {
+      const row = page[i];
+      let s = c.ramp;
+      if (!row) return s;
+      if (row['Color value']) s += `<path data-component="ticker-value-box" d="${c.boxPath}" fill="${escAttr(row['Color value'])}" mask="url(#${c.mask})"/>`;
+      s += `<text data-slot="short" x="${f2(c.cx + ts.short.linePaddingEm.left * 32)}" y="${f2(listY + ts.short.linePaddingEm.top * 32 + 32)}" font-weight="700" font-size="32" fill="${ts.short.color}">${esc(def(row['Kort namn'], ''))}</text>`;
+      s += `<text data-slot="value" x="${f2(c.cx + colW - ts.value.linePaddingEm.right * 32)}" y="${f2(listY + ts.value.linePaddingEm.top * 32 + 32)}" text-anchor="end" font-weight="700" font-size="32" fill="#fff" filter="url(#${id('vshadow')})">${esc(def(row['Procent string'], ''))}</text>`;
+      if (row['Eget namn']) s += `<text data-slot="long" x="${f2(c.cx + ts.long.linePaddingEm.left * 18)}" y="${f2(listY + listH - 9)}" font-weight="400" font-size="18" fill="${ts.long.color}">${esc(row['Eget namn'])}</text>`;
+      return s;
+    }).join(''));
+    out.layout = { y, logo: { x: lx, w: lw, variant: v.id }, ticker: { x: tx, w: tw }, list: { x: listX, y: listY, w: listW, h: listH, colW } };
+    return out;
+  }
+
   // ---------- full lower third ----------
   // content: { name, title, logo (logo-box variant id), page (4 ticker rows), clock, date }
   // options: measureText(text, { weight, sizePx }) -> advance in px (browser: canvas measureText) sizes the
@@ -383,46 +445,8 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
     { const ns = nameStrap({ name, title }, { measureText, row: 'own', defs });
       body += ns.namePlate + ns.nameText + ns.titlePlate + ns.titleText; }
     // logo box + ticker
-    { const lb = comp('logo-box'), v = lb.variants.find(x => x.id === logoId), y = rows.mainRow.y;
-      if (!v) throw new Error(`unknown logo-box variant "${logoId}"`);
-      body += plate(lb, v.flowicsSize.w, lb.layout.x, y, { defs, ...(v.fill ? { fill: v.fill } : {}), ...(v.bevel ? { bevel: v.bevel } : {}) });
-      body += wordmark(v, lb.layout.x, y);
-      const tk = comp('ticker-plate');
-      const tx = lb.layout.x + v.flowicsSize.w - REG.adjacentPlateOverlapPx;   // = 341.5 in Flowics (BÖRSLUNCH)
-      const tw = REG.rows.safeRight - tx;
-      body += plate(tk, tw, tx, y, { defs });
-      // columns
-      const col = comp('ticker-column'), vb = comp('ticker-value-box'), ramp = comp('ticker-column-ramp');
-      const listX = tx + col.layout.listInsetFromPlate.x, listY = y + col.layout.listInsetFromPlate.y, listW = REG.rows.safeRight - listX, listH = col.layout.listHeight;
-      const colW = listW / 4;
-      defs.push(`<linearGradient id="${id('rampg')}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${ramp.fill.color}" stop-opacity="0"/><stop offset="1" stop-color="${ramp.fill.color}" stop-opacity="1"/></linearGradient>`,
-        `<filter id="${id('vshadow')}" x="-5%" y="-20%" width="110%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="1" flood-color="#000" flood-opacity="0.5"/></filter>`);
-      // Flowics masks the whole list with the ticker's hard mask: nothing in the columns paints outside the plate.
-      const tclip = nid('tclip');
-      defs.push(`<clipPath id="${tclip}"><path d="${shapePath(tk.shape, tw, tx, y)}"/></clipPath>`);
-      body += `<g data-group="ticker-columns" clip-path="url(#${tclip})">`;
-      page.forEach((row, i) => {
-        const cx = listX + i * colW;
-        // ramp: 235 wide, right-anchored in a rect that starts 2px below the list top; gradient 46.4%..89.5% of the column
-        const rx = cx + colW - ramp.size.w, ry = listY + 2;
-        const g0 = (cx + colW * 0.464 - rx) / ramp.size.w, g1 = (cx + colW * 0.895 - rx) / ramp.size.w;
-        const gid = nid('rg'); defs.push(`<linearGradient id="${gid}" x1="${f2(Math.max(0, g0))}" y1="0" x2="${f2(g1)}" y2="0"><stop offset="0" stop-color="${ramp.fill.color}" stop-opacity="0"/><stop offset="1" stop-color="${ramp.fill.color}" stop-opacity="1"/></linearGradient>`);
-        // last column: straight right edge with rounded right corners instead of the slanted ramp
-        const rs = i === page.length - 1 ? ramp.lastColumn.shape : ramp.shape;
-        body += `<path data-component="ticker-column-ramp" d="${shapePath(rs, ramp.size.w, rx, ry)}" fill="url(#${gid})"/>`;
-        // value box: 195.5 x 34.7 at 97% of the free space, faded in from the left of the column
-        const bx = cx + (colW - vb.size.w) * 0.97, by = listY + vb.layout.yOffsetInColumn;
-        const mid = nid('vm'), fid = nid('vf');
-        const s0 = (cx + colW * 0.515 - bx) / vb.size.w;
-        defs.push(`<linearGradient id="${fid}" x1="0" y1="0" x2="1" y2="0"><stop offset="${f2(Math.max(0, s0))}" stop-color="#fff" stop-opacity="${s0 < 0 ? f2(-s0 / (1 - s0)) : 0}"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient>`,
-          `<mask id="${mid}" maskUnits="userSpaceOnUse" x="${f2(bx)}" y="${f2(by)}" width="${vb.size.w}" height="${vb.size.h}"><rect x="${f2(bx)}" y="${f2(by)}" width="${vb.size.w}" height="${vb.size.h}" fill="url(#${fid})"/></mask>`);
-        body += `<path data-component="ticker-value-box" d="${shapePath(vb.shape, vb.size.w, bx, by)}" fill="${row['Color value']}" mask="url(#${mid})"/>`;
-        const ts = col.text;
-        body += `<text data-slot="short" x="${f2(cx + ts.short.linePaddingEm.left * 32)}" y="${f2(listY + ts.short.linePaddingEm.top * 32 + 32)}" font-weight="700" font-size="32" fill="${ts.short.color}">${esc(row['Kort namn'])}</text>`;
-        body += `<text data-slot="value" x="${f2(cx + colW - ts.value.linePaddingEm.right * 32)}" y="${f2(listY + ts.value.linePaddingEm.top * 32 + 32)}" text-anchor="end" font-weight="700" font-size="32" fill="#fff" filter="url(#${id('vshadow')})">${esc(row['Procent string'])}</text>`;
-        if (row['Eget namn']) body += `<text data-slot="long" x="${f2(cx + ts.long.linePaddingEm.left * 18)}" y="${f2(listY + listH - 9)}" font-weight="400" font-size="18" fill="${ts.long.color}">${esc(row['Eget namn'])}</text>`;
-      });
-      body += '</g>'; }
+    { const lt = logoTicker({ logo: logoId, pages: page.length ? [page] : [] }, { defs });
+      body += lt.logoPlate + lt.wordmark + lt.tickerPlate + `<g data-group="ticker-columns" clip-path="url(#${lt.tickerClip})">${lt.pages.join('')}</g>`; }
     // logo line
     { const L = comp('logo-line-left'), R = comp('logo-line-right'), y = rows.logoLine.y;
       body += plate(L, L.layout.w, L.layout.x, y, { defs });
@@ -473,6 +497,6 @@ text{font-family:AkkuratStd,Arial,sans-serif}</style>`;
     return out;
   }
 
-  return { comp, resetIds, plate, logoFilters, efnLogo, wordmark, svgDocument, titleWidth, namePlateWidth, nameStrap, composite, elements,
+  return { comp, resetIds, plate, logoFilters, efnLogo, wordmark, svgDocument, titleWidth, namePlateWidth, nameStrap, logoTicker, composite, elements,
     geom, shapePath, slantOffset, cornerGeom };
 }

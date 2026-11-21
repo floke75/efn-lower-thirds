@@ -19,11 +19,20 @@
 //   static get defaults()            data used when load() gets no data (mirrors the manifest schema defaults)
 //   static get animation()           { in: {channel: {delay, duration, ease}}, out: {...} }  (ms; ease: see EASE)
 //   normalize(data)                  -> clean data object (types coerced, unknown fields dropped)
-//   buildScene(data)                 -> { defs: string[], body: string }  SVG markup for the 1920x1080 stage
+//   buildScene(scene)                -> { defs: string[], body: string }  SVG markup for the 1920x1080 stage
 //   bindScene(svg)                   look up the elements applyChannels() drives
-//   applyChannels(values)            values = {channel: 0..1}; update transforms / clip rects
+//   applyChannels(values, T)         values = {channel: 0..1} at time T (ms); update transforms / clip rects
+// Optional, for graphics with their own data source or time-based content (e.g. ticker pages):
+//   async prepare()                  called by load() before the first render (e.g. fetch a feed); teardown()
+//                                    undoes it (called by dispose() and before a new load())
+//   resolve(data)                    -> the scene to draw: the data plus anything from outside it (default: data).
+//                                    Rebuilt whenever its JSON changes. Call this._refresh() when an outside
+//                                    source changes it (real-time only; non-real-time scenes come from the schedule)
+//   timingKey(scene)                 the part of the scene that time-based content depends on; this._sceneLog
+//                                    records when it changed ([{ at, key, scene }]), in both render types
+//   isAnimating(T), nextAnimationAt(T)   keep the real-time loop running / wake it up at a later time
 //
-// Written as plain ES2020 (no class fields), so it runs in older Chromium/CEF builds used by renderers.
+// Written as plain ES2018 (no class fields, ??, ?.), so it runs in older Chromium/CEF builds used by renderers.
 import { createLowerThird, loadFonts, browserMeasureText } from './efn-lower-thirds.mjs';
 
 export const EASE = {
@@ -31,7 +40,19 @@ export const EASE = {
   'sine.in': (p) => 1 - Math.cos((p * Math.PI) / 2),
   'sine.out': (p) => Math.sin((p * Math.PI) / 2),
   'sine.inOut': (p) => -(Math.cos(Math.PI * p) - 1) / 2,
+  slow: slowMo(0.7, 0.7),   // GSAP "slow" (SlowMo with its defaults): fast, a long slow middle, fast
 };
+
+// GSAP SlowMo ease (EasePack), non-yoyo: linearRatio of the tween runs at a near-constant slow speed.
+function slowMo(linearRatio, power) {
+  const pow = linearRatio < 1 ? power : 0, p1 = (1 - linearRatio) / 2, p3 = p1 + linearRatio;
+  return (p) => {
+    const r = p + (0.5 - p) * pow;
+    if (p < p1) { const q = 1 - p / p1; return r - q * q * q * q * r; }
+    if (p > p3) { const q = (p - p3) / p1; return r + (p - r) * q * q * q * q; }
+    return r;
+  };
+}
 
 const STAGE_CSS = `
 :host { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
@@ -53,6 +74,8 @@ export class EfnGraphic extends HTMLElement {
     this._origin = 0;                          // performance.now() at load()
     this._floor = 0;                           // the real-time clock never runs backwards past this (see _waitUntil)
     this._raf = 0;
+    this._wake = 0;                            // timer that restarts the frame loop (nextAnimationAt)
+    this._sceneLog = [];                       // [{ at, key, scene }] when timingKey(scene) changed
     this._waits = new Set();                   // pending action promises { timer, resolve }
     this._schedule = [];                       // non-real-time
     this._renderedKey = null;
@@ -64,6 +87,7 @@ export class EfnGraphic extends HTMLElement {
     const { data, renderType = 'realtime' } = params || {};
     try {
       this._cancel();
+      this.teardown();
       this._renderType = renderType === 'non-realtime' ? 'non-realtime' : 'realtime';
       this._origin = performance.now();
       this._floor = 0;
@@ -74,8 +98,12 @@ export class EfnGraphic extends HTMLElement {
       this.lt = createLowerThird({ idPrefix: this._id });
       this.measureText = browserMeasureText();
       this._data = this.normalize(Object.assign({}, this.constructor.defaults, data || {}));
+      await this.prepare();
       this._root.innerHTML = '';
-      this._render(this._renderType === 'realtime' ? this._now() : 0, this._data);
+      const t = this._renderType === 'realtime' ? this._now() : 0;
+      this._sceneLog = [];
+      this._noteScene(this._sceneLog, t, this._data);
+      this._render(t, this._data);
       return { statusCode: 200 };
     } catch (e) {
       return error(e);
@@ -84,8 +112,10 @@ export class EfnGraphic extends HTMLElement {
 
   async dispose() {
     this._cancel();
+    this.teardown();
     this._root.innerHTML = '';
     this._log = [];
+    this._sceneLog = [];
     this._schedule = [];
     this._svg = null;
     return { statusCode: 200 };
@@ -128,7 +158,12 @@ export class EfnGraphic extends HTMLElement {
     const { data } = params || {};
     try {
       this._data = this.normalize(Object.assign({}, this._data, data || {}));
-      if (this._renderType === 'realtime') this._render(this._now(), this._data);
+      if (this._renderType === 'realtime') {
+        const now = this._now();
+        this._noteScene(this._sceneLog, now, this._data);
+        this._render(now, this._data);
+        this._loop();
+      }
       return { statusCode: 200 };
     } catch (e) {
       return error(e);
@@ -151,8 +186,9 @@ export class EfnGraphic extends HTMLElement {
   async goToTime(params) {
     try {
       const T = Math.max(0, Number(params && params.timestamp) || 0);
-      const { log, data } = this._replaySchedule(T);
+      const { log, data, sceneLog } = this._replaySchedule(T);
       this._log = log;
+      this._sceneLog = sceneLog;
       this._render(T, data);
       return { statusCode: 200 };
     } catch (e) {
@@ -231,15 +267,26 @@ export class EfnGraphic extends HTMLElement {
     return values;
   }
 
-  // Start time of the most recent take-in at or before T (glint loops are timed from it), or null if hidden.
-  _shownSince(T) {
-    let since = null;
-    for (const e of this._log) if (e.at <= T) since = e.kind === 'in' ? e.at : null;
-    return since;
+  // The most recent showing at or before T: { since, until } from its take-in to its take-out (until: null while
+  // it is still in). A take-in while already in continues the same showing. null if never shown.
+  _showingAt(T) {
+    let cur = null;
+    for (const e of this._log) {
+      if (e.at > T) break;
+      if (e.kind === 'in') { if (!cur || cur.until !== null) cur = { since: e.at, until: null }; }
+      else if (cur && cur.until === null) cur.until = e.at;
+    }
+    return cur;
   }
 
-  // Keep the log short in long real-time sessions: once nothing is animating, the state is fully described by
-  // one instant entry.
+  // Start of the current showing at T (glint loops are timed from it), or null if taken out.
+  _shownSince(T) {
+    const s = this._showingAt(T);
+    return s && s.until === null ? s.since : null;
+  }
+
+  // Keep the logs short in long real-time sessions: once nothing is animating, the state is fully described by
+  // one instant entry (and the scene-log entries from the start of the current showing on).
   _compact(now) {
     if (!this._log.length) return;
     const busy = this._log.some((e) => this._entryEnd(e) > now);
@@ -247,6 +294,33 @@ export class EfnGraphic extends HTMLElement {
     const last = this._log[this._log.length - 1];
     const since = this._shownSince(now);
     this._log = [{ at: last.kind === 'in' ? since : last.at, kind: last.kind, instant: true }];
+    const from = last.kind === 'in' ? since : now;
+    let i = 0;
+    while (i + 1 < this._sceneLog.length && this._sceneLog[i + 1].at <= from) i++;
+    this._sceneLog = this._sceneLog.slice(i);
+  }
+
+  // ---------- scenes ----------
+
+  resolve(data) { return data; }
+  timingKey() { return ''; }
+  async prepare() {}
+  teardown() {}
+  isAnimating() { return false; }
+  nextAnimationAt() { return null; }
+
+  _noteScene(log, at, data) {
+    const scene = this.resolve(data), key = this.timingKey(scene), last = log[log.length - 1];
+    if (!last || last.key !== key) log.push({ at, key, scene });
+  }
+
+  // For subclasses: something outside the OGraf data changed the scene (e.g. new feed data). Real-time only.
+  _refresh() {
+    if (this._renderType !== 'realtime' || !this._svg) return;
+    const now = this._now();
+    this._noteScene(this._sceneLog, now, this._data);
+    this._render(now, this._data);
+    this._loop();
   }
 
   // ---------- non-real-time schedule ----------
@@ -254,18 +328,19 @@ export class EfnGraphic extends HTMLElement {
   _replaySchedule(T) {
     let data = this.normalize(Object.assign({}, this._data));
     let step;
-    const log = [];
+    const log = [], sceneLog = [];
+    this._noteScene(sceneLog, 0, data);
     for (const item of this._schedule) {
       if (item.timestamp > T) break;
       const a = item.action || {}, p = a.params || {}, at = item.timestamp;
-      if (a.type === 'updateAction') data = this.normalize(Object.assign({}, data, p.data || {}));
+      if (a.type === 'updateAction') { data = this.normalize(Object.assign({}, data, p.data || {})); this._noteScene(sceneLog, at, data); }
       else if (a.type === 'playAction') {
         const target = this._targetStep(step, p.goto, p.delta);
         if (target === undefined) { log.push({ at, kind: 'out', instant: !!p.skipAnimation }); step = undefined; }
         else { if (step === undefined) log.push({ at, kind: 'in', instant: !!p.skipAnimation }); step = target; }
       } else if (a.type === 'stopAction') { log.push({ at, kind: 'out', instant: !!p.skipAnimation }); step = undefined; }
     }
-    return { log, data };
+    return { log, data, sceneLog };
   }
 
   // ---------- rendering ----------
@@ -275,15 +350,16 @@ export class EfnGraphic extends HTMLElement {
   _now() { return Math.max(performance.now() - this._origin, this._floor); }
 
   _render(T, data) {
-    const key = JSON.stringify(data);
+    const resolved = this.resolve(data);
+    const key = JSON.stringify(resolved);
     if (key !== this._renderedKey) {
-      const scene = this.buildScene(data);
+      const scene = this.buildScene(resolved);
       this._root.innerHTML = `<style>${STAGE_CSS}</style><svg class="efn-stage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet"><defs>${scene.defs.join('')}</defs>${scene.body}</svg>`;
       this._svg = this._root.querySelector('svg');
       this.bindScene(this._svg);
       this._renderedKey = key;
     }
-    this.applyChannels(this._valuesAt(T));
+    this.applyChannels(this._valuesAt(T), T);
     this._syncGlint(T);
   }
 
@@ -303,13 +379,18 @@ export class EfnGraphic extends HTMLElement {
     }
   }
 
+  // Real-time frame loop: renders every frame while something animates, then sleeps until nextAnimationAt().
   _loop() {
-    if (this._raf || typeof requestAnimationFrame !== 'function') return;
+    if (this._renderType !== 'realtime' || typeof requestAnimationFrame !== 'function') return;
+    if (this._wake) { clearTimeout(this._wake); this._wake = 0; }
+    if (this._raf) return;
     const tick = () => {
       this._raf = 0;
       const now = this._now();
       this._render(now, this._data);
-      if (this._log.some((e) => this._entryEnd(e) > now)) this._raf = requestAnimationFrame(tick);
+      if (this._log.some((e) => this._entryEnd(e) > now) || this.isAnimating(now)) { this._raf = requestAnimationFrame(tick); return; }
+      const next = this.nextAnimationAt(now);
+      if (typeof next === 'number' && next > now) this._wake = setTimeout(() => { this._wake = 0; this._loop(); }, next - now);
     };
     this._raf = requestAnimationFrame(tick);
   }
@@ -333,6 +414,8 @@ export class EfnGraphic extends HTMLElement {
     this._resolveWaits();
     if (this._raf && typeof cancelAnimationFrame === 'function') cancelAnimationFrame(this._raf);
     this._raf = 0;
+    if (this._wake) clearTimeout(this._wake);
+    this._wake = 0;
     this._renderedKey = null;
   }
 }

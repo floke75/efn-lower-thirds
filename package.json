@@ -1,6 +1,6 @@
 {
   "name": "efn-lower-thirds",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "EFN lower thirds as SVG for OGraf: OGraf v1 graphics, browser/Node renderer, slant and corner geometry, design data and assets.",
   "type": "module",

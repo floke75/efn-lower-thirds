@@ -131,7 +131,7 @@ The name-plate rule in `namePlateWidth()` is **provisional**: at least 588.5 px,
 
 ## Animation and states
 
-Implemented for the name strap (`ograf/efn-name-strap.mjs`); the other graphics follow the same model (`ograf/lib/efn-graphic.mjs`).
+Implemented for the name strap (`ograf/efn-name-strap.mjs`) and the logo box + ticker (`ograf/efn-ticker.mjs`); the other graphics follow the same model (`ograf/lib/efn-graphic.mjs`).
 
 The Flowics original's animations are summarised in `design-tokens.json` (`animation`, `states`). The full GSAP preset table is in `reference/flowics/animation-presets.json`. Per-element in/out timings and `updateAnimation` are in `reference/flowics/layout-spec.json`.
 
@@ -139,7 +139,12 @@ The Flowics original's animations are summarised in `design-tokens.json` (`anima
 - **Text:**
   - name and title wipe in (`linearWipeRightIn`) after the plate
   - text updates slide the old text out left and the new text in from the right, 500 ms each
-- **Ticker:** pages of 4 items, items staggered 50 ms (`slideLeftBigIn` 360 ms, GSAP SlowMo). Cycles every 6 s by default; the interval is operator-controlled.
+- **Logo box and ticker plate:** `slideLeftSolidIn` 500 ms / `slideLeftSolidOut` 400 ms, `sine.in`, both from 0 ms. The ticker plate slides under its own slanted left edge (Flowics clips it with its hard mask).
+- **Ticker columns** (Flowics "Anim Container"): in `slideLeftBigIn` (from 75 px left, fading in) at 400 ms for 360 ms, GSAP `slow` (SlowMo 0.7/0.7); out `linearWipeLeftOut` 0–200 ms, `sine.in`.
+- **Ticker pages** (Flowics list item, one page of 4 values): in `slideLeftBigIn` at 700 ms for 500 ms, out `slideRightBigOut` 0–500 ms, both `sine.in`. The 50 ms stagger never applies, since a page is the only item shown.
+  - Paging: automatic, every 6 s by default (operator-controlled interval). Each take-in starts at the first page.
+  - A page turn plays the old page's out and the new page's in at the same time, so the new page arrives 700 ms after the turn.
+  - A change of interval or page count restarts the timer; a page that no longer exists falls back to the first.
 - **Logo line:** the halves slide in from their sides (600 ms), the EFN logo expands in (300 ms, `power1`), and the back gradient fades in (900 ms).
 - **Overlay totals in/out (ms):**
   - name strap 1200 / 870

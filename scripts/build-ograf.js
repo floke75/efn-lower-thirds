@@ -27,8 +27,10 @@ fs.writeFileSync(path.join(OUT, 'lib', 'efn-lower-thirds.mjs'),
 fs.writeFileSync(path.join(OUT, 'README.md'), `# EFN lower thirds: OGraf graphics (${pkg.version})
 
 OGraf v1 graphics (https://ograf.ebu.io). Each \`*.ograf.json\` file in this folder is one graphic; give your
-renderer or OGraf server this folder (or the zip of it). Everything the graphics need is inside it, referenced
-relatively, with no network access required. Serve it over http(s): browsers block ES modules on file:// URLs.
+renderer or OGraf server this folder (or the zip of it). Everything the graphics draw with is inside it,
+referenced relatively. The one network request is the ticker's data: efn-ticker fetches the EFN ticker feed (a
+Flowics JSON datasource, CORS-enabled), so the renderer needs internet access for it, or pass \`pages\` in the data.
+Serve the folder over http(s), with .mjs as text/javascript: browsers block ES modules on file:// URLs.
 
 Built from the efn-lower-thirds repository. Contains the licensed AkkuratStd font: keep it within EFN.
 `);

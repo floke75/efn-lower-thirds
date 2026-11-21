@@ -3,7 +3,8 @@
 // get wrong, plus the lifecycle checks the EBU runs on its own examples. Used by ograf-dev/index.html.
 //
 //   import { runConformance } from './conformance.js';
-//   const results = await runConformance(manifestUrl);   // [{ name, pass, detail }]
+//   const results = await runConformance(manifestUrl, { data });   // [{ name, pass, detail }]
+// data (optional): merged over the manifest's schema defaults for every load() and updateAction().
 
 // A class can be registered under only one tag name: reuse the existing registration (as a renderer must when
 // it shows a graphic twice), otherwise register it under a new tag.
@@ -22,12 +23,12 @@ const has = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
 // Instance-specific ids (and nothing else) may differ between two renders of the same state.
 const snapshot = (el) => (el.shadowRoot ? el.shadowRoot.innerHTML : el.innerHTML).replace(/efn\d+-/g, 'efnX-');
 
-export async function runConformance(manifestUrl) {
+export async function runConformance(manifestUrl, options = {}) {
   const results = [];
   const check = (name, pass, detail = '') => results.push({ name, pass: !!pass, detail });
   const manifestHref = new URL(manifestUrl, location.href).href;
   const manifest = await (await fetch(manifestHref, { cache: 'no-store' })).json();
-  const defaults = Object.fromEntries(Object.entries((manifest.schema && manifest.schema.properties) || {}).filter(([, p]) => 'default' in p).map(([k, p]) => [k, p.default]));
+  const defaults = Object.assign(Object.fromEntries(Object.entries((manifest.schema && manifest.schema.properties) || {}).filter(([, p]) => 'default' in p).map(([k, p]) => [k, p.default])), options.data || {});
   const durations = Object.fromEntries((manifest.actionDurations || []).filter(d => d.type !== 'customAction').map(d => [d.type, d.duration]));
   const stepCount = manifest.stepCount === undefined ? 1 : manifest.stepCount;
 
